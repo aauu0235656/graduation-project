@@ -27,6 +27,13 @@
 # ===== 生成脚本（论文用） =====
 /gen-*.js
 /gen-*.py
+/api-doc.js
+/db-tables.js
+
+# ===== 废弃/临时目录 =====
+/untitled/
+/generated-images/
+/crawl_batch*.json
 
 # ===== 系统文件 =====
 .DS_Store

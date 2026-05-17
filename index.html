@@ -1,0 +1,2652 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>党内法规知识库问答系统</title>
+  <style>
+    /* ===== 全局重置与变量 ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red:       #c0112a;
+      --red-dark:  #900d1f;
+      --red-light: #e8192c;
+      --gold:      #f0c040;
+      --gold-dim:  #c8991a;
+      --bg:        #f5f5f5;
+      --card:      #ffffff;
+      --border:    #e0e0e0;
+      --text:      #1a1a1a;
+      --muted:     #666666;
+      --sidebar-w: 240px;
+      --header-h:  64px;
+      --radius:    10px;
+      --shadow:    0 2px 12px rgba(0,0,0,.10);
+    }
+
+    body {
+      font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===== 顶部导航栏 ===== */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: var(--header-h);
+      background: linear-gradient(135deg, var(--red-dark) 0%, var(--red) 60%, #b5001a 100%);
+      display: flex; align-items: center; padding: 0 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.25);
+    }
+    header .logo {
+      display: flex; align-items: center; gap: 12px; flex: 1;
+    }
+    header .logo .emblem {
+      width: 42px; height: 42px;
+      background: var(--gold);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 900; color: var(--red-dark);
+      box-shadow: 0 0 0 3px rgba(240,192,64,.4);
+      flex-shrink: 0;
+    }
+    header .logo h1 {
+      font-size: 18px; font-weight: 700;
+      color: #fff;
+      letter-spacing: 1px;
+      line-height: 1.3;
+    }
+    header .logo h1 span { display: block; font-size: 11px; font-weight: 400; opacity: .75; letter-spacing: 2px; }
+
+    /* ===== 主体布局 ===== */
+    .app-body {
+      margin-top: var(--header-h);
+      flex: 1;
+      display: flex;
+      min-height: calc(100vh - var(--header-h));
+    }
+
+    /* ===== 左侧边栏 ===== */
+    aside {
+      width: var(--sidebar-w);
+      background: #fff;
+      border-right: 1px solid var(--border);
+      padding: 20px 0;
+      position: fixed;
+      top: var(--header-h); bottom: 0;
+      overflow-y: auto;
+    }
+    aside .section-label {
+      font-size: 11px; font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 2px;
+      padding: 0 18px 8px;
+      text-transform: uppercase;
+    }
+    aside ul { list-style: none; margin-bottom: 20px; }
+    aside ul li a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 18px;
+      font-size: 13.5px; color: var(--text);
+      text-decoration: none; border-radius: 0;
+      transition: all .15s;
+      border-left: 3px solid transparent;
+    }
+    aside ul li a:hover { background: #fef0f0; color: var(--red); }
+    aside ul li a.active {
+      background: #fef0f0; color: var(--red);
+      border-left-color: var(--red);
+      font-weight: 600;
+    }
+    aside ul li a .icon {
+      width: 20px; height: 20px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-style: normal;
+    }
+    aside .divider { height: 1px; background: var(--border); margin: 8px 18px; }
+    aside .stat-card {
+      margin: 0 14px 12px;
+      background: #fef8f8;
+      border: 1px solid #f8d7d7;
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+    aside .stat-card .stat-num { font-size: 22px; font-weight: 800; color: var(--red); }
+    aside .stat-card .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* ===== 内容区 ===== */
+    main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      padding: 28px 32px;
+      overflow-y: auto;
+    }
+
+    /* ===== 页面区块显示控制 ===== */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ===== 通用卡片 ===== */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px 28px;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 16px; font-weight: 700;
+      color: var(--red-dark);
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #fce4e4;
+    }
+    .card-title .badge {
+      background: var(--red); color: #fff;
+      font-size: 11px; padding: 2px 8px; border-radius: 20px;
+      font-weight: 600;
+    }
+
+    /* ===== 首页统计 ===== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-box {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px 22px;
+      display: flex; align-items: center; gap: 16px;
+      border-top: 3px solid var(--red);
+    }
+    .stat-box .ico { font-size: 32px; }
+    .stat-box .info .n { font-size: 26px; font-weight: 800; color: var(--red); line-height: 1; }
+    .stat-box .info .l { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .stat-box:nth-child(2) { border-top-color: #1976d2; }
+    .stat-box:nth-child(2) .info .n { color: #1976d2; }
+    .stat-box:nth-child(3) { border-top-color: #388e3c; }
+    .stat-box:nth-child(3) .info .n { color: #388e3c; }
+    .stat-box:nth-child(4) { border-top-color: var(--gold-dim); }
+    .stat-box:nth-child(4) .info .n { color: var(--gold-dim); }
+
+    /* ===== 首页欢迎横幅 ===== */
+    .welcome-banner {
+      background: linear-gradient(135deg, var(--red-dark) 0%, var(--red) 100%);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      color: #fff;
+      display: flex; align-items: center; gap: 24px;
+      position: relative; overflow: hidden;
+    }
+    .welcome-banner::before {
+      content: "★";
+      position: absolute; right: 30px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 100px; opacity: .07; color: #fff;
+      pointer-events: none;
+    }
+    .welcome-banner .big-title { font-size: 22px; font-weight: 800; letter-spacing: 1px; margin-bottom: 6px; }
+    .welcome-banner .sub { font-size: 13px; opacity: .85; line-height: 1.7; }
+    .welcome-banner .tag {
+      display: inline-block;
+      background: rgba(255,255,255,.2);
+      border-radius: 4px; padding: 2px 10px;
+      font-size: 12px; margin: 6px 4px 0 0;
+    }
+
+    /* ===== 功能特性卡片 ===== */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .feature-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      border-left: 4px solid var(--red);
+      transition: transform .2s, box-shadow .2s;
+      cursor: pointer;
+    }
+    .feature-card:nth-child(2) { border-left-color: #1976d2; }
+    .feature-card:nth-child(3) { border-left-color: #388e3c; }
+    .feature-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,.14); }
+    .feature-card .fc-icon { font-size: 30px; margin-bottom: 10px; }
+    .feature-card .fc-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .feature-card .fc-desc { font-size: 12.5px; color: var(--muted); line-height: 1.65; }
+
+    /* ===== 索引构建页 ===== */
+    .upload-zone {
+      border: 2px dashed #d4d4d4;
+      border-radius: var(--radius);
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+      background: #fafafa;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--red);
+      background: #fff5f5;
+    }
+    .upload-zone .uz-icon { font-size: 48px; margin-bottom: 12px; }
+    .upload-zone .uz-text { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .upload-zone .uz-hint { font-size: 12px; color: var(--muted); }
+    .upload-zone input[type=file] { display: none; }
+
+    .file-list { margin-top: 16px; }
+    .file-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 14px;
+      background: #f8f8f8;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      border: 1px solid var(--border);
+    }
+    .file-item .fi-name { flex: 1; font-size: 13px; font-weight: 500; }
+    .file-item .fi-size { font-size: 12px; color: var(--muted); }
+    .file-item .fi-remove {
+      background: none; border: none; cursor: pointer;
+      color: #aaa; font-size: 16px; padding: 0 4px;
+    }
+    .file-item .fi-remove:hover { color: var(--red); }
+
+    .build-progress { margin-top: 16px; display: none; }
+    .progress-bar-wrap {
+      background: #e8e8e8; border-radius: 4px; height: 10px; overflow: hidden; margin-bottom: 8px;
+    }
+    .progress-bar {
+      height: 100%; border-radius: 4px;
+      background: linear-gradient(90deg, var(--red), var(--red-light));
+      width: 0%; transition: width .3s;
+    }
+    .progress-steps { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+    .progress-step {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; color: var(--muted);
+    }
+    .progress-step .step-dot {
+      width: 16px; height: 16px; border-radius: 50%;
+      background: #e0e0e0; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; color: #fff;
+    }
+    .progress-step.done .step-dot { background: #388e3c; }
+    .progress-step.running .step-dot { background: var(--red); animation: pulse 1s infinite; }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    .index-result {
+      background: #f0faf0; border: 1px solid #b8e8b8;
+      border-radius: 8px; padding: 16px 20px; margin-top: 16px;
+      display: none;
+    }
+    .index-result .ir-title { font-weight: 700; color: #2e7d32; margin-bottom: 8px; font-size: 14px; }
+    .index-result .ir-row {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: #333; margin-bottom: 4px;
+    }
+
+    /* ===== 全文检索页 ===== */
+    .search-bar {
+      display: flex; gap: 10px; margin-bottom: 20px; align-items: stretch;
+    }
+    .search-bar input {
+      flex: 1; padding: 12px 16px; border: 2px solid var(--border);
+      border-radius: 8px; font-size: 14px; outline: none;
+      transition: border-color .2s;
+    }
+    .search-bar input:focus { border-color: var(--red); }
+    .search-bar select {
+      padding: 12px 14px; border: 2px solid var(--border); border-radius: 8px;
+      font-size: 13px; outline: none; background: #fff; cursor: pointer;
+    }
+    .search-bar select:focus { border-color: var(--red); }
+
+    .btn {
+      padding: 11px 26px; border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      transition: all .2s; white-space: nowrap;
+    }
+    .btn-primary { background: var(--red); color: #fff; }
+    .btn-primary:hover { background: var(--red-dark); }
+    .btn-secondary { background: #f0f0f0; color: var(--text); }
+    .btn-secondary:hover { background: #e0e0e0; }
+    .btn-sm { padding: 7px 16px; font-size: 13px; }
+    .btn-gold { background: var(--gold); color: var(--red-dark); font-weight: 700; }
+    .btn-gold:hover { background: var(--gold-dim); color: #fff; }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    .search-filters {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;
+    }
+    .filter-tag {
+      padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+      border: 1.5px solid var(--border); background: #fff; cursor: pointer;
+      transition: all .15s; color: var(--muted);
+    }
+    .filter-tag.active { border-color: var(--red); background: #fef0f0; color: var(--red); }
+
+    .search-stats { font-size: 12.5px; color: var(--muted); margin-bottom: 14px; }
+    .search-stats strong { color: var(--red); }
+
+    .result-list { display: flex; flex-direction: column; gap: 12px; }
+    .result-item {
+      background: var(--card); border-radius: var(--radius);
+      box-shadow: 0 1px 6px rgba(0,0,0,.07);
+      padding: 18px 22px;
+      border-left: 4px solid transparent;
+      transition: box-shadow .2s, border-color .2s;
+      cursor: pointer;
+    }
+    .result-item:hover { box-shadow: 0 4px 16px rgba(0,0,0,.12); border-left-color: var(--red); }
+    .result-item .ri-head {
+      display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px;
+    }
+    .result-item .ri-title { font-size: 15px; font-weight: 700; color: var(--red-dark); }
+    .result-item .ri-score {
+      font-size: 12px; color: #fff; background: var(--red);
+      padding: 2px 8px; border-radius: 20px; flex-shrink: 0; margin-left: 10px;
+    }
+    .result-item .ri-meta {
+      display: flex; gap: 12px; flex-wrap: wrap;
+      font-size: 12px; color: var(--muted); margin-bottom: 8px;
+    }
+    .result-item .ri-meta span { display: flex; align-items: center; gap: 4px; }
+    .result-item .ri-snippet {
+      font-size: 13px; line-height: 1.7; color: #444;
+    }
+    .result-item .ri-snippet em { background: #fff3cd; color: #664d03; padding: 1px 2px; font-style: normal; border-radius: 2px; }
+    .result-item .ri-tags { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+    .result-item .ri-tag {
+      font-size: 11px; padding: 2px 8px; border-radius: 4px;
+      background: #f0f0f0; color: #666;
+    }
+    .result-item .ri-tag.red { background: #fce4e4; color: var(--red); }
+
+    .empty-tip {
+      text-align: center; padding: 60px 20px; color: var(--muted);
+    }
+    .empty-tip .et-icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-tip .et-text { font-size: 14px; }
+
+    /* ===== 文档详情模态框 ===== */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.5); z-index: 1000;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #fff; border-radius: 12px; width: 760px; max-width: 94vw;
+      max-height: 85vh; overflow-y: auto;
+      box-shadow: 0 16px 48px rgba(0,0,0,.25);
+      padding: 30px 34px;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute; top: 16px; right: 20px;
+      background: none; border: none; font-size: 22px; cursor: pointer; color: #999;
+    }
+    .modal-close:hover { color: var(--red); }
+    .modal h2 { font-size: 18px; font-weight: 800; color: var(--red-dark); margin-bottom: 4px; line-height: 1.4; }
+    .modal .doc-meta { font-size: 12px; color: var(--muted); margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 12px; }
+    .modal .doc-body { font-size: 13.5px; line-height: 1.9; color: #333; white-space: pre-wrap; }
+    .modal .doc-body em { background: #fff3cd; color: #664d03; padding: 1px 2px; font-style: normal; border-radius: 2px; }
+
+    /* ===== 问答页 ===== */
+    .qa-layout {
+      display: grid; grid-template-columns: 1fr 320px; gap: 20px;
+    }
+    .chat-window {
+      background: var(--card); border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: flex; flex-direction: column;
+      height: calc(100vh - var(--header-h) - 80px);
+      min-height: 500px;
+    }
+    .chat-header {
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .chat-header .online-dot { width: 8px; height: 8px; border-radius: 50%; background: #4caf50; animation: blink 1.5s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .chat-header .ch-name { font-size: 14px; font-weight: 700; }
+    .chat-header .ch-sub { font-size: 11.5px; color: var(--muted); }
+    .chat-messages {
+      flex: 1; overflow-y: auto; padding: 20px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+
+    .msg { display: flex; gap: 10px; max-width: 85%; }
+    .msg.user { flex-direction: row-reverse; align-self: flex-end; }
+    .msg .avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+    .msg.bot .avatar { background: linear-gradient(135deg, var(--red-dark), var(--red)); color: #fff; }
+    .msg.user .avatar { background: #1976d2; color: #fff; }
+    .msg .bubble {
+      padding: 12px 16px; border-radius: 12px; font-size: 13.5px; line-height: 1.75;
+    }
+    .msg.bot .bubble { background: #f5f5f5; color: var(--text); border-bottom-left-radius: 4px; }
+    .msg.user .bubble { background: var(--red); color: #fff; border-bottom-right-radius: 4px; }
+    .msg .bubble .src-list { margin-top: 10px; font-size: 12px; }
+    .msg .bubble .src-list .src-title { color: var(--muted); margin-bottom: 4px; }
+    .msg.bot .bubble .src-list .src-title { color: #888; }
+    .msg .bubble .src-item {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(192,17,42,.08); border-radius: 4px;
+      padding: 5px 10px; margin-top: 4px; cursor: pointer;
+      font-size: 12px; color: var(--red-dark); font-weight: 500;
+    }
+    .msg .bubble .src-item:hover { background: rgba(192,17,42,.16); }
+    .typing-dots span {
+      display: inline-block; width: 6px; height: 6px;
+      background: #aaa; border-radius: 50%; margin: 0 2px;
+      animation: bounce .8s infinite;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: .15s; }
+    .typing-dots span:nth-child(3) { animation-delay: .3s; }
+    @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
+
+    .chat-input-area {
+      padding: 14px 18px;
+      border-top: 1px solid var(--border);
+    }
+    .quick-questions { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .quick-q {
+      font-size: 12px; padding: 5px 12px;
+      background: #fef0f0; color: var(--red);
+      border-radius: 20px; cursor: pointer; border: 1px solid #f8d0d0;
+      transition: all .15s;
+    }
+    .quick-q:hover { background: var(--red); color: #fff; }
+    .input-row { display: flex; gap: 10px; }
+    .chat-textarea {
+      flex: 1; resize: none; padding: 10px 14px;
+      border: 2px solid var(--border); border-radius: 8px;
+      font-size: 13.5px; font-family: inherit; outline: none;
+      transition: border-color .2s; height: 44px; max-height: 120px;
+      overflow-y: auto; line-height: 1.5;
+    }
+    .chat-textarea:focus { border-color: var(--red); }
+
+    .qa-panel { display: flex; flex-direction: column; gap: 16px; }
+    .context-docs {
+      background: var(--card); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 18px 20px;
+      flex: 1; overflow-y: auto;
+    }
+    .context-docs .ct-title { font-size: 13px; font-weight: 700; color: var(--red-dark); margin-bottom: 12px; }
+    .context-doc-item {
+      padding: 10px 12px; border-radius: 6px;
+      border: 1px solid var(--border); margin-bottom: 8px;
+      cursor: pointer; transition: all .15s;
+    }
+    .context-doc-item:hover { border-color: var(--red); background: #fef8f8; }
+    .context-doc-item .cdi-name { font-size: 12.5px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+    .context-doc-item .cdi-score {
+      font-size: 11px; color: var(--muted);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .cdi-score-bar {
+      flex: 1; height: 4px; background: #e8e8e8; border-radius: 2px; overflow: hidden;
+    }
+    .cdi-score-bar .fill { height: 100%; background: var(--red); border-radius: 2px; }
+    .context-doc-item .cdi-excerpt { font-size: 11.5px; color: #666; margin-top: 4px; line-height: 1.6; }
+
+    .params-card {
+      background: var(--card); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 16px 18px;
+    }
+    .params-card .p-title { font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 12px; letter-spacing: 1px; text-transform: uppercase; }
+    .param-row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+    .param-row label { font-size: 12px; color: var(--text); font-weight: 500; display: flex; justify-content: space-between; }
+    .param-row label span { color: var(--red); font-weight: 700; }
+    .param-row input[type=range] { width: 100%; accent-color: var(--red); }
+    .param-row select, .param-row input[type=number] {
+      width: 100%; padding: 6px 10px; border: 1px solid var(--border);
+      border-radius: 6px; font-size: 12.5px; outline: none;
+    }
+
+    /* ===== 数据集管理页 ===== */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      background: #fef0f0; color: var(--red-dark);
+      padding: 11px 14px; text-align: left; font-weight: 700;
+      border-bottom: 2px solid #f8d7d7;
+    }
+    tbody tr { border-bottom: 1px solid #f0f0f0; transition: background .15s; }
+    tbody tr:hover { background: #fafafa; }
+    tbody td { padding: 10px 14px; color: var(--text); vertical-align: middle; line-height: 22px; }
+    .tag { display: inline-block; padding: 2px 9px; border-radius: 4px; font-size: 11px; font-weight: 600; line-height: 20px; }
+    .tag-red { background: #fce4e4; color: var(--red); }
+    .tag-blue { background: #e3f0fb; color: #1565c0; }
+    .tag-green { background: #e8f5e9; color: #2e7d32; }
+    .tag-gray { background: #f0f0f0; color: #555; }
+    .tag-orange { background: #fff3e0; color: #e65100; }
+    .action-btns { display: flex; gap: 6px; }
+    .import-tip { background:#FFF8E1; border-left:4px solid #FF9800; padding:10px 14px; border-radius:0 7px 7px 0; font-size:13px; margin-bottom:12px; }
+    #import-dropzone:hover { border-color: var(--red); background: var(--bg-warm,#FFF8E1); }
+
+    /* ===== 动画 ===== */
+    .fade-in { animation: fadeIn .3s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  </style>
+</head>
+<body>
+
+<!-- ===== 顶部导航 ===== -->
+<header>
+  <div class="logo">
+    <div class="emblem">党</div>
+    <h1>党内法规知识库问答系统
+      <span>基于LLM + RAG · 数字党建智能平台</span>
+    </h1>
+  </div>
+</header>
+
+<div class="app-body">
+  <!-- ===== 左侧边栏 ===== -->
+  <aside>
+    <div class="section-label">系统功能</div>
+    <ul>
+      <li><a href="#" onclick="switchPage('home',null);setActive(this)"><span class="icon">🏠</span>首页</a></li>
+      <li><a href="#" onclick="switchPage('index',null);setActive(this)"><span class="icon">🗂</span>索引构建</a></li>
+      <li><a href="#" onclick="switchPage('search',null);setActive(this)"><span class="icon">🔍</span>全文检索</a></li>
+      <li><a href="#" onclick="switchPage('qa',null);setActive(this)"><span class="icon">💬</span>智能问答</a></li>
+    </ul>
+    <div class="divider"></div>
+    <div class="section-label">数据管理</div>
+    <ul>
+      <li><a href="#" onclick="switchPage('dataset',null);setActive(this)"><span class="icon">📚</span>法规数据集</a></li>
+      <li><a href="#" onclick="switchPage('crawler',null);setActive(this)"><span class="icon">🕷</span>爬虫采集</a></li>
+    </ul>
+    <div class="divider"></div>
+    <div class="section-label">索引状态</div>
+    <div class="stat-card">
+      <div class="stat-num" id="sidebar-doc-count">-</div>
+      <div class="stat-label">已索引文档数</div>
+    </div>
+    <div class="stat-card" style="background:#f0f8ff;border-color:#c0d8f0;">
+      <div class="stat-num" style="color:#1976d2;" id="sidebar-idx-status">正常</div>
+      <div class="stat-label">索引状态</div>
+    </div>
+  </aside>
+
+  <!-- ===== 主内容区 ===== -->
+  <main>
+
+    <!-- ==================== 首页 ==================== -->
+    <div id="page-home" class="page active fade-in">
+      <div class="welcome-banner">
+        <div>
+          <div class="big-title">党内法规知识库智能问答系统</div>
+          <div class="sub">
+            基于大语言模型（LLM）与检索增强生成（RAG）技术，响应"数字党建"与"智慧党建"时代号召，<br>
+            助力党内法规学习、理解与执行，让党规党纪触手可及。
+          </div>
+          <div style="margin-top:10px;">
+            <span class="tag">📖 党章党规</span>
+            <span class="tag">⚖️ 纪律条例</span>
+            <span class="tag">📋 党内法规</span>
+            <span class="tag">🔍 全文检索</span>
+            <span class="tag">🤖 智能问答</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="ico">📄</div>
+          <div class="info">
+            <div class="n" id="stat-docs">-</div>
+            <div class="l">已收录法规文件</div>
+          </div>
+        </div>
+        <div class="stat-box">
+          <div class="ico">🗂</div>
+          <div class="info">
+            <div class="n" id="stat-chunks">-</div>
+            <div class="l">索引文本分块</div>
+          </div>
+        </div>
+        <div class="stat-box">
+          <div class="ico">💬</div>
+          <div class="info">
+            <div class="n" id="stat-qa">-</div>
+            <div class="l">累计问答次数</div>
+          </div>
+        </div>
+        <div class="stat-box">
+          <div class="ico">⭐</div>
+          <div class="info">
+            <div class="n" id="stat-acc">-</div>
+            <div class="l">索引文档数</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card" onclick="switchPage('index',null)">
+          <div class="fc-icon">🗂</div>
+          <div class="fc-title">全文索引构建</div>
+          <div class="fc-desc">支持上传党内法规文档（PDF/Word/TXT），自动完成文本清洗、分块、向量化，构建高性能全文索引，支持增量更新与版本管理。</div>
+        </div>
+        <div class="feature-card" onclick="switchPage('search',null)">
+          <div class="fc-icon">🔍</div>
+          <div class="fc-title">关键词全文检索</div>
+          <div class="fc-desc">基于倒排索引的高效全文检索，支持多关键词组合查询、布尔逻辑、字段过滤，并高亮显示命中片段，精准定位法规条文。</div>
+        </div>
+        <div class="feature-card" onclick="switchPage('qa',null)">
+          <div class="fc-icon">💬</div>
+          <div class="fc-title">RAG 智能问答</div>
+          <div class="fc-desc">基于检索增强生成（RAG）技术，融合语义检索与大语言模型推理，精准回答党规党纪相关问题，提供可溯源的法规依据。</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⚙️ 技术架构 <span class="badge">RAG Pipeline</span></div>
+        <div style="display:flex; gap:0; align-items:center; overflow-x:auto; padding-bottom:4px;">
+          <div style="text-align:center; flex:1; min-width:100px;">
+            <div style="background:#fce4e4;border:2px solid var(--red);border-radius:8px;padding:12px 8px;font-size:13px;font-weight:700;color:var(--red-dark);">📄 文档爬取<br/><span style="font-size:11px;font-weight:400;color:#888;">党规法规数据集</span></div>
+          </div>
+          <div style="color:#ccc;font-size:20px;padding:0 6px;">→</div>
+          <div style="text-align:center; flex:1; min-width:100px;">
+            <div style="background:#e3f2fd;border:2px solid #1976d2;border-radius:8px;padding:12px 8px;font-size:13px;font-weight:700;color:#1565c0;">🔄 文本处理<br/><span style="font-size:11px;font-weight:400;color:#888;">清洗·分块·向量化</span></div>
+          </div>
+          <div style="color:#ccc;font-size:20px;padding:0 6px;">→</div>
+          <div style="text-align:center; flex:1; min-width:100px;">
+            <div style="background:#e8f5e9;border:2px solid #388e3c;border-radius:8px;padding:12px 8px;font-size:13px;font-weight:700;color:#2e7d32;">🗂 索引构建<br/><span style="font-size:11px;font-weight:400;color:#888;">Lucene + 向量检索</span></div>
+          </div>
+          <div style="color:#ccc;font-size:20px;padding:0 6px;">→</div>
+          <div style="text-align:center; flex:1; min-width:100px;">
+            <div style="background:#fff3e0;border:2px solid #f57c00;border-radius:8px;padding:12px 8px;font-size:13px;font-weight:700;color:#e65100;">🔍 检索召回<br/><span style="font-size:11px;font-weight:400;color:#888;">关键词+语义</span></div>
+          </div>
+          <div style="color:#ccc;font-size:20px;padding:0 6px;">→</div>
+          <div style="text-align:center; flex:1; min-width:100px;">
+            <div style="background:#f3e5f5;border:2px solid #7b1fa2;border-radius:8px;padding:12px 8px;font-size:13px;font-weight:700;color:#6a1b9a;">🤖 LLM 生成<br/><span style="font-size:11px;font-weight:400;color:#888;">答案合成·溯源</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="card-title" style="margin-bottom:0;">📰 最近收录法规</div>
+          <span id="recent-refresh-hint" style="font-size:11px;color:var(--muted);"></span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>法规名称</th><th style="text-align:center;">类别</th><th style="text-align:center;">来源</th><th style="text-align:center;">状态</th></tr>
+            </thead>
+            <tbody id="recent-docs-tbody">
+              <tr><td colspan="4" style="text-align:center;color:#999;padding:20px;">加载中...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 索引构建页 ==================== -->
+    <div id="page-index" class="page fade-in">
+      <div class="card">
+        <div class="card-title">📂 上传法规文档</div>
+        <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()"
+             ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragleave="handleDragLeave(event)">
+          <div class="uz-icon">📁</div>
+          <div class="uz-text">点击选择文件，或将文件拖拽到此处</div>
+          <div class="uz-hint">支持 PDF、Word(.docx)、TXT、JSON 格式，单文件最大 50MB</div>
+          <input type="file" id="file-input" multiple accept=".pdf,.docx,.txt,.json" onchange="handleFileSelect(event)" />
+        </div>
+        <div class="file-list" id="file-list"></div>
+        <div style="display:flex;gap:10px;margin-top:16px;" id="upload-actions" style="display:none">
+          <button class="btn btn-primary" id="build-btn" onclick="startBuildIndex()" disabled>🗂 开始构建索引</button>
+          <button class="btn btn-secondary" onclick="clearFiles()">清空列表</button>
+        </div>
+      </div>
+
+      <div class="card" id="build-progress-card" style="display:none;">
+        <div class="card-title">⏳ 索引构建进度</div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="build-bar"></div>
+        </div>
+        <div id="progress-pct" style="font-size:13px;color:var(--muted);margin-bottom:12px;">0%</div>
+        <div class="progress-steps" id="progress-steps">
+          <div class="progress-step" id="step-1"><div class="step-dot">1</div>文档解析与文本提取</div>
+          <div class="progress-step" id="step-2"><div class="step-dot">2</div>文本清洗与规范化</div>
+          <div class="progress-step" id="step-3"><div class="step-dot">3</div>智能文本分块（Chunking）</div>
+          <div class="progress-step" id="step-4"><div class="step-dot">4</div>Lucene 倒排索引构建（SmartChineseAnalyzer）</div>
+          <div class="progress-step" id="step-5"><div class="step-dot">5</div>语义向量化（阿里云 text-embedding-v3）</div>
+          <div class="progress-step" id="step-6"><div class="step-dot">6</div>向量数据持久化（MySQL）</div>
+        </div>
+        <div class="index-result" id="index-result">
+          <div class="ir-title">✅ 索引构建成功！</div>
+          <div class="ir-row"><span>📄</span><span id="ir-docs">文档数：—</span></div>
+          <div class="ir-row"><span>🔢</span><span id="ir-chunks">文本分块数：—</span></div>
+          <div class="ir-row"><span>⏱</span><span id="ir-time">构建耗时：—</span></div>
+          <div style="margin-top:12px;">
+            <button class="btn btn-primary btn-sm" onclick="switchPage('search',null)">🔍 立即检索</button>
+            <button class="btn btn-gold btn-sm" onclick="switchPage('qa',null)" style="margin-left:8px;">💬 开始问答</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⚙️ 索引构建参数</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:4px;">
+
+          <!-- Embedding 模型 -->
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px 18px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <span style="font-size:18px;">🧠</span>
+              <span style="font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;">Embedding 模型</span>
+            </div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.5;">text-embedding-v3</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px;">阿里云百炼 · 1024 维</div>
+          </div>
+
+          <!-- 全文索引引擎 -->
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px 18px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <span style="font-size:18px;">🔍</span>
+              <span style="font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;">全文索引引擎</span>
+            </div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.5;">Apache Lucene 8.11</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px;">SmartChineseAnalyzer</div>
+          </div>
+
+          <!-- 向量存储 -->
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px 18px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <span style="font-size:18px;">🗄️</span>
+              <span style="font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;">向量存储</span>
+            </div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.5;">MySQL</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px;">embedding 字段持久化</div>
+          </div>
+
+          <!-- 大模型 -->
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px 18px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <span style="font-size:18px;">✨</span>
+              <span style="font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;">大模型</span>
+            </div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.5;">qwen-plus</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px;">阿里云百炼</div>
+          </div>
+
+        </div>
+        <!-- 隐藏的range控件（保留功能值） -->
+        <div style="display:none;">
+          <input type="range" id="lbl-chunk-input" min="200" max="1024" step="100" value="500" oninput="document.getElementById('lbl-chunk').textContent=this.value">
+          <span id="lbl-chunk">500</span>
+          <input type="range" id="lbl-overlap-input" min="0" max="200" step="25" value="100" oninput="document.getElementById('lbl-overlap').textContent=this.value">
+          <span id="lbl-overlap">100</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 全文检索页 ==================== -->
+    <div id="page-search" class="page fade-in">
+      <div class="card">
+        <div class="card-title">🔍 关键词全文检索</div>
+        <div class="search-bar">
+          <input type="text" id="search-input" placeholder="输入关键词，如：党员纪律处分、廉洁自律、监督检查…" onkeydown="if(event.key==='Enter')doSearch()" />
+          <select id="search-type">
+            <option value="all">全部字段</option>
+            <option value="title">仅标题</option>
+            <option value="content">仅正文</option>
+          </select>
+          <button class="btn btn-primary" onclick="doSearch()">🔍 检索</button>
+          <button class="btn btn-secondary" onclick="clearSearch()">清空</button>
+        </div>
+        <div class="search-filters">
+          <span style="font-size:12px;color:var(--muted);margin-right:4px;">类别筛选：</span>
+          <span class="filter-tag active" onclick="toggleFilter(this,'all')">全部</span>
+          <span class="filter-tag" onclick="toggleFilter(this,'党章')">党章</span>
+          <span class="filter-tag" onclick="toggleFilter(this,'纪律法规')">纪律法规</span>
+          <span class="filter-tag" onclick="toggleFilter(this,'监督法规')">监督法规</span>
+          <span class="filter-tag" onclick="toggleFilter(this,'廉洁法规')">廉洁法规</span>
+          <span class="filter-tag" onclick="toggleFilter(this,'干部管理')">干部管理</span>
+          <span class="filter-tag" onclick="toggleFilter(this,'组织建设')">组织建设</span>
+        </div>
+        <div id="search-stats" class="search-stats" style="display:none;"></div>
+        <div id="search-results">
+          <div class="empty-tip">
+            <div class="et-icon">🔍</div>
+            <div class="et-text">输入关键词开始检索党内法规文档</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 问答页 ==================== -->
+    <div id="page-qa" class="page fade-in">
+      <div class="qa-layout">
+        <div class="chat-window">
+          <div class="chat-header">
+            <div class="online-dot"></div>
+            <div>
+              <div class="ch-name">党规党纪智能问答助手</div>
+              <div class="ch-sub">基于 RAG · 回答有据可查</div>
+            </div>
+            <button class="btn btn-secondary btn-sm" style="margin-left:auto;" onclick="clearChat()">🗑 清空对话</button>
+          </div>
+          <div class="chat-messages" id="chat-messages">
+            <div class="msg bot">
+              <div class="avatar">党</div>
+              <div class="bubble">
+                您好！我是党内法规智能问答助手 🎖️<br><br>
+                我基于 <strong>检索增强生成（RAG）</strong> 技术，能够精准回答党规党纪相关问题，每个回答均标注法规来源，确保有据可查。<br><br>
+                您可以问我：
+                <ul style="margin:8px 0 0 16px;line-height:2;">
+                  <li>党纪处分的具体条款与适用情形</li>
+                  <li>党员应履行的义务与享有的权利</li>
+                  <li>党内监督与廉洁自律的相关规定</li>
+                  <li>党内法规的适用范围与解释</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <div class="quick-questions">
+              <span class="quick-q" onclick="sendQuickQ(this)">党员受到警告处分的情形有哪些？</span>
+              <span class="quick-q" onclick="sendQuickQ(this)">党员有哪些基本权利？</span>
+              <span class="quick-q" onclick="sendQuickQ(this)">严重违纪如何处理？</span>
+              <span class="quick-q" onclick="sendQuickQ(this)">廉洁自律的主要规定</span>
+            </div>
+            <div class="input-row">
+              <textarea class="chat-textarea" id="chat-input" placeholder="请输入您的问题，按 Enter 发送，Shift+Enter 换行…" onkeydown="handleChatKey(event)"></textarea>
+              <button class="btn btn-primary" onclick="sendMessage()">发送</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="qa-panel">
+          <div class="context-docs">
+            <div class="ct-title">📎 当前检索上下文文档</div>
+            <div id="context-docs-list">
+              <div style="text-align:center;color:var(--muted);font-size:12px;padding:20px 0;">发起对话后显示检索到的相关法规文档</div>
+            </div>
+          </div>
+          <div class="params-card">
+            <div class="p-title">RAG 参数</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px;">
+
+              <!-- 检索策略 -->
+              <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                  <span style="font-size:18px;">🔀</span>
+                  <span style="font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;">检索策略</span>
+                </div>
+                <select id="qa-strategy" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12.5px;outline:none;background:var(--card);color:var(--text);">
+                  <option value="hybrid">混合检索（BM25 + 向量）</option>
+                  <option value="bm25">仅关键词检索（BM25）</option>
+                  <option value="vector">仅语义检索（向量）</option>
+                </select>
+              </div>
+
+              <!-- LLM 模型 -->
+              <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                  <span style="font-size:18px;">🤖</span>
+                  <span style="font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;">LLM 模型</span>
+                </div>
+                <select style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12.5px;outline:none;background:var(--card);color:var(--text);">
+                  <option>qwen-plus（阿里云百炼）</option>
+                </select>
+              </div>
+
+            </div>
+            <!-- 隐藏的range控件 -->
+            <div style="display:none;">
+              <input type="range" id="qa-topk" min="1" max="10" value="5" oninput="document.getElementById('lbl-topk').textContent=this.value">
+              <span id="lbl-topk">5</span>
+              <input type="range" id="qa-temp" min="1" max="15" value="7" oninput="document.getElementById('lbl-temp').textContent=(this.value/10).toFixed(1)">
+              <span id="lbl-temp">0.7</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 数据集管理页 ==================== -->
+    <div id="page-dataset" class="page fade-in">
+      <div class="card">
+        <div class="card-title">📚 党内法规数据集管理 <span class="badge" id="ds-total-badge">共 <span id="ds-total">10</span> 条</span></div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+          <input type="text" id="ds-search" placeholder="搜索法规名称…" oninput="filterDataset()" style="padding:8px 14px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;flex:1;min-width:200px;outline:none;" />
+          <select id="ds-cat-filter" onchange="filterDataset()" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;outline:none;">
+            <option value="">全部类别</option>
+            <option value="党章">党章</option>
+            <option value="纪律法规">纪律法规</option>
+            <option value="监督法规">监督法规</option>
+            <option value="廉洁法规">廉洁法规</option>
+            <option value="干部管理">干部管理</option>
+            <option value="组织建设">组织建设</option>
+            <option value="准则">准则</option>
+            <option value="工作条例">工作条例</option>
+          </select>
+          <select id="ds-status-filter" onchange="filterDataset()" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;outline:none;">
+            <option value="">全部状态</option>
+            <option value="1">已索引</option>
+            <option value="0">待索引</option>
+            <option value="2">索引失败</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="openImportModal()">+ 导入数据</button>
+          <button class="btn btn-secondary btn-sm" onclick="batchIndex()">🗂 批量索引</button>
+          <button class="btn btn-gold btn-sm" onclick="batchRebuildAll()">🔄 强制重建索引</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th><input type="checkbox" /></th>
+                <th>法规名称</th>
+                <th>类别</th>
+                <th>发布机关</th>
+                <th>发布/修订时间</th>
+                <th>字符数</th>
+                <th>分块数</th>
+                <th>来源</th>
+                <th>索引状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="dataset-tbody">
+            </tbody>
+          </table>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;font-size:12px;color:var(--muted);">
+          <span id="ds-page-info">共 <span id="ds-filtered-count">10</span> 条记录</span>
+          <div style="display:flex;gap:6px;" id="ds-pagination"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 爬虫采集页（学习强国专用） ==================== -->
+    <div id="page-crawler" class="page fade-in">
+
+      <!-- 顶部说明 -->
+      <div class="card" style="padding:16px 20px;">
+        <div class="card-title">🕷 学习强国爬虫采集</div>
+        <p style="font-size:13px;color:var(--muted);margin-top:8px;">
+          预览：仅查看文章内容，不存入数据库。入库：直接爬取并存入法规数据集。
+        </p>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button id="crawler-tab-preview" class="btn btn-primary btn-sm" onclick="crawlerSwitchTab('preview')">👁 内容预览</button>
+          <button id="crawler-tab-single" class="btn btn-secondary btn-sm" onclick="crawlerSwitchTab('single')">📄 单篇入库</button>
+          <button id="crawler-tab-multi" class="btn btn-secondary btn-sm" onclick="crawlerSwitchTab('multi')">📋 批量入库</button>
+          <button id="crawler-tab-ai" class="btn btn-secondary btn-sm" onclick="crawlerSwitchTab('ai')">🤖 AI 分析</button>
+          <button id="crawler-tab-qa" class="btn btn-secondary btn-sm" onclick="crawlerSwitchTab('qa')">💬 生成问答对</button>
+        </div>
+      </div>
+
+      <!-- 内容预览（只看不入库） -->
+      <div id="crawler-panel-preview" class="card" style="margin-top:12px;">
+        <div class="card-title">👁 内容预览</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">粘贴学习强国文章URL，仅预览内容，不存入数据库。</p>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <input type="text" id="crawler-preview-url" placeholder="学习强国文章URL，如：https://www.xuexi.cn/lgpage/detail/index.html?id=13226399"
+            style="flex:1;min-width:300px;padding:9px 14px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;outline:none;" />
+          <button class="btn btn-primary btn-sm" onclick="crawlerXuexiPreview()">👁 预览</button>
+        </div>
+
+        <!-- 预览结果 -->
+        <div id="crawler-preview-box" style="display:none;margin-top:16px;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;background:#fff;">
+          <!-- 文章头部信息栏 -->
+          <div style="padding:18px 20px 14px;border-bottom:1px solid var(--border);background:#fafafa;">
+            <div style="font-weight:700;font-size:17px;line-height:1.5;color:var(--text);margin-bottom:8px;" id="crawler-preview-title"></div>
+            <div style="font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:14px;" id="crawler-preview-meta"></div>
+          </div>
+          <!-- 字数统计 -->
+          <div id="crawler-preview-stats" style="padding:6px 20px;background:#f0f4ff;font-size:12px;color:#1565c0;border-bottom:1px solid #dce8ff;"></div>
+          <!-- 正文 HTML 渲染区 -->
+          <div id="crawler-preview-content" style="padding:24px 32px;max-height:520px;overflow-y:auto;font-size:14px;color:#333;line-height:2;background:#fffdf7;"></div>
+        </div>
+        <div id="crawler-preview-loading" style="display:none;text-align:center;padding:20px;color:var(--muted);font-size:13px;">
+          ⏳ 正在爬取，请稍候…
+        </div>
+      </div>
+
+      <!-- 单篇入库（直接入库，不需要预览） -->
+      <div id="crawler-panel-single" class="card" style="margin-top:12px;display:none;">
+        <div class="card-title">📄 单篇入库</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">粘贴学习强国文章URL，直接爬取并存入法规数据集，无需预览。</p>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <input type="text" id="crawler-single-url" placeholder="学习强国文章URL，如：https://www.xuexi.cn/lgpage/detail/index.html?id=13226399"
+            style="flex:1;min-width:300px;padding:9px 14px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;outline:none;" />
+          <select id="crawler-single-category" style="padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;outline:none;">
+            <option value="其他">其他</option>
+            <option value="党章">党章</option>
+            <option value="纪律法规">纪律法规</option>
+            <option value="组织法规">组织法规</option>
+            <option value="监督法规">监督法规</option>
+            <option value="廉洁法规">廉洁法规</option>
+            <option value="干部管理">干部管理</option>
+            <option value="宣传法规">宣传法规</option>
+            <option value="党务管理">党务管理</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="crawlerXuexiSave()">💾 确认入库</button>
+        </div>
+        <div id="crawler-single-loading" style="display:none;text-align:center;padding:20px;color:var(--muted);font-size:13px;">
+          ⏳ 正在爬取并入库，请稍候…
+        </div>
+      </div>
+
+      <!-- 批量爬取入库 -->
+      <div id="crawler-panel-multi" class="card" style="margin-top:12px;display:none;">
+        <div class="card-title">📋 批量爬取入库</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">每行一个学习强国文章URL，批量爬取后直接存入数据集。</p>
+        <textarea id="crawler-multi-urls" rows="6"
+          placeholder="每行一个学习强国URL，例如：&#10;https://www.xuexi.cn/lgpage/detail/index.html?id=13226399&#10;https://www.xuexi.cn/lgpage/detail/index.html?id=xxxx"
+          style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;outline:none;resize:vertical;font-family:inherit;"></textarea>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px;">
+          <select id="crawler-multi-category" style="padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;outline:none;">
+            <option value="其他">其他</option>
+            <option value="党章">党章</option>
+            <option value="纪律法规">纪律法规</option>
+            <option value="组织法规">组织法规</option>
+            <option value="监督法规">监督法规</option>
+            <option value="廉洁法规">廉洁法规</option>
+            <option value="干部管理">干部管理</option>
+            <option value="宣传法规">宣传法规</option>
+            <option value="党务管理">党务管理</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="crawlerXuexiSaveMulti()">💾 批量入库</button>
+        </div>
+        <div id="crawler-multi-loading" style="display:none;text-align:center;padding:20px;color:var(--muted);font-size:13px;">
+          ⏳ 正在批量爬取入库，请稍候…
+        </div>
+        <div id="crawler-multi-result" style="display:none;margin-top:12px;"></div>
+      </div>
+
+      <!-- AI 分析面板 -->
+      <div id="crawler-panel-ai" class="card" style="margin-top:12px;display:none;">
+        <div class="card-title">🤖 AI 文章分析</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">粘贴学习强国文章URL，由大模型自动生成摘要、关键知识点和关键词。</p>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px;">
+          <input type="text" id="crawler-ai-url" placeholder="学习强国文章URL"
+            style="flex:1;min-width:300px;padding:9px 14px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;outline:none;" />
+          <button class="btn btn-primary btn-sm" onclick="crawlerAiAnalyze()">🤖 单篇分析</button>
+        </div>
+
+        <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:16px;">
+          <div style="font-weight:700;font-size:14px;margin-bottom:10px;">📋 批量 AI 分析</div>
+          <textarea id="crawler-ai-urls" rows="4"
+            placeholder="每行一个学习强国URL，批量进行 AI 分析"
+            style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;outline:none;resize:vertical;font-family:inherit;"></textarea>
+          <button class="btn btn-primary btn-sm" style="margin-top:10px;" onclick="crawlerAiAnalyzeMulti()">🤖 批量分析</button>
+        </div>
+
+        <div id="crawler-ai-loading" style="display:none;text-align:center;padding:20px;color:var(--muted);font-size:13px;">
+          ⏳ 正在爬取并 AI 分析，请稍候（大模型生成需要几秒）…
+        </div>
+        <div id="crawler-ai-result" style="display:none;margin-top:12px;"></div>
+      </div>
+
+      <!-- 生成问答对面板 -->
+      <div id="crawler-panel-qa" class="card" style="margin-top:12px;display:none;">
+        <div class="card-title">💬 AI 生成问答对</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">粘贴学习强国文章URL，由大模型自动生成 3~5 组问答对，可用于知识库检索。</p>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <input type="text" id="crawler-qa-url" placeholder="学习强国文章URL"
+            style="flex:1;min-width:300px;padding:9px 14px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;outline:none;" />
+          <button class="btn btn-primary btn-sm" onclick="crawlerGenerateQa()">💬 生成问答对</button>
+        </div>
+
+        <div id="crawler-qa-loading" style="display:none;text-align:center;padding:20px;color:var(--muted);font-size:13px;">
+          ⏳ 正在爬取并生成问答对，请稍候（大模型生成需要几秒）…
+        </div>
+        <div id="crawler-qa-result" style="display:none;margin-top:12px;"></div>
+      </div>
+
+      <!-- 使用说明 -->
+      <div class="card" style="margin-top:12px;background:#fffdf5;border:1.5px solid #f0d080;">
+        <div class="card-title" style="color:#a07000;">💡 使用说明</div>
+        <ul style="font-size:13px;color:#666;line-height:2;padding-left:20px;">
+          <li><b>内容预览</b>：粘贴文章URL → 查看文章内容，不存入数据库。</li>
+          <li><b>单篇入库</b>：粘贴文章URL → 选择类别 → 直接入库。</li>
+          <li><b>批量入库</b>：多篇文章URL每行一个 → 选择类别 → 直接批量入库。</li>
+          <li><b>AI 分析</b>：粘贴URL → 大模型自动生成摘要、关键词、关键知识点。</li>
+          <li><b>生成问答对</b>：粘贴URL → 大模型自动生成 3~5 组问答对。</li>
+          <li>入库后的文章在"法规数据集"中可见，状态为"待索引"，可在"索引构建"页面进行索引。</li>
+          <li>URL格式支持：<code>lgpage/detail/index.html?id=xxx</code> 或 <code>/{hash}.html</code> 两种格式。</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- ===== 导入数据弹窗 ===== -->
+    <div class="modal-overlay" id="import-modal">
+      <div class="modal" style="max-width:620px;">
+        <div class="modal-header">
+          <h3 style="font-size:16px;">📥 导入法规数据</h3>
+          <button onclick="closeImportModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);">✕</button>
+        </div>
+        <div style="padding:20px;">
+          <!-- 手动录入 -->
+          <div style="margin-bottom:20px;">
+            <div style="font-weight:700;margin-bottom:12px;font-size:14px;">📝 手动录入法规</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div>
+                <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;">法规名称 *</label>
+                <input type="text" id="import-title" placeholder="请输入法规全称" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;outline:none;" />
+              </div>
+              <div>
+                <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;">法规类别 *</label>
+                <select id="import-category" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;outline:none;">
+                  <option value="">请选择类别</option>
+                  <option value="党章">党章</option>
+                  <option value="纪律法规">纪律法规</option>
+                  <option value="监督法规">监督法规</option>
+                  <option value="廉洁法规">廉洁法规</option>
+                  <option value="干部管理">干部管理</option>
+                  <option value="组织建设">组织建设</option>
+                  <option value="准则">准则</option>
+                  <option value="工作条例">工作条例</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;">发布机关</label>
+                <input type="text" id="import-org" placeholder="如：中共中央" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;outline:none;" />
+              </div>
+              <div>
+                <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;">发布/修订日期</label>
+                <input type="date" id="import-date" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;outline:none;" />
+              </div>
+            </div>
+            <div style="margin-top:10px;">
+              <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;">法规正文内容 *</label>
+              <textarea id="import-content" placeholder="请粘贴或输入法规正文内容…" style="width:100%;height:160px;padding:10px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;outline:none;resize:vertical;font-family:inherit;" ></textarea>
+            </div>
+            <button class="btn btn-primary btn-sm" style="margin-top:12px;" onclick="submitImport()">✓ 提交录入</button>
+          </div>
+          <div style="border-top:1px dashed var(--border);padding-top:16px;margin-top:4px;">
+            <div style="font-weight:700;margin-bottom:12px;font-size:14px;">📁 批量导入文件</div>
+            <div id="import-dropzone" onclick="document.getElementById('import-file-input').click()" style="border:2px dashed var(--border);border-radius:10px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;" ondragover="event.preventDefault();this.style.borderColor='var(--red)'" ondragleave="this.style.borderColor='var(--border)'" ondrop="handleImportDrop(event)">
+              <div style="font-size:32px;margin-bottom:8px;">📂</div>
+              <div style="font-size:13px;color:var(--muted);">点击或拖拽文件到此处上传</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px;">支持 .txt、.json 格式（每条法规一个文件）</div>
+              <input type="file" id="import-file-input" multiple accept=".txt,.json" style="display:none;" onchange="handleImportFiles(this.files)" />
+            </div>
+            <div id="import-file-list" style="margin-top:10px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ===== 文档详情模态框 ===== -->
+<div class="modal-overlay" id="doc-modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal" style="max-width:780px;width:96%;max-height:88vh;display:flex;flex-direction:column;">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <!-- 标题 -->
+    <h2 id="modal-title" style="font-size:18px;font-weight:700;line-height:1.5;padding-right:32px;margin-bottom:10px;"></h2>
+    <!-- 元信息 -->
+    <div class="doc-meta" id="modal-meta" style="margin-bottom:10px;"></div>
+    <!-- 来源区（有 filePath 时显示） -->
+    <div id="modal-source-bar" style="display:none;margin-bottom:12px;padding:8px 14px;background:#e8f5e9;border-radius:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span style="font-size:13px;color:#2e7d32;font-weight:600;">🔗 数据来源</span>
+      <span id="modal-source-label" style="font-size:12px;color:#555;flex:1;word-break:break-all;"></span>
+      <a id="modal-source-link" href="#" target="_blank"
+        style="display:inline-block;background:#2e7d32;color:#fff;border-radius:6px;padding:4px 14px;font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap;">
+        🌐 跳转原页面
+      </a>
+    </div>
+    <!-- 字数统计 -->
+    <div id="modal-stats" style="font-size:12px;color:#1565c0;background:#f0f4ff;padding:5px 14px;border-radius:6px;margin-bottom:10px;"></div>
+    <!-- 正文 HTML 渲染区 -->
+    <div id="modal-body" style="flex:1;overflow-y:auto;font-size:14px;color:#333;line-height:2;padding:16px 20px;background:#fffdf7;border:1px solid #e0e0e0;border-radius:8px;"></div>
+  </div>
+</div>
+
+<script>
+// ===== 后端API地址 =====
+const API_BASE = 'http://localhost:8088/api';
+
+// ===== 首页统计（从后端加载） =====
+function loadStats() {
+  loadDashboardStats();
+}
+
+// ===== 页面切换 =====
+function switchPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  if (name === 'dataset' && typeof renderDataset === 'function') renderDataset();
+  if (name === 'home') { loadDashboardStats(); loadRecentDocs(); }
+}
+function setActive(el) {
+  document.querySelectorAll('aside ul li a').forEach(a => a.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ===== 文件上传 =====
+let uploadedFiles = [];
+function handleFileSelect(e) { addFiles(Array.from(e.target.files)); }
+function handleDragOver(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('drag-over'); }
+function handleDragLeave(e) { document.getElementById('upload-zone').classList.remove('drag-over'); }
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.remove('drag-over');
+  addFiles(Array.from(e.dataTransfer.files));
+}
+function addFiles(files) {
+  files.forEach(f => { if(!uploadedFiles.find(x=>x.name===f.name)) uploadedFiles.push(f); });
+  renderFileList();
+}
+function renderFileList() {
+  const list = document.getElementById('file-list');
+  const icons = {pdf:'📄',docx:'📝',txt:'📃',json:'📋'};
+  list.innerHTML = uploadedFiles.map((f,i) => `
+    <div class="file-item">
+      <span style="font-size:20px;">${icons[f.name.split('.').pop()]||'📄'}</span>
+      <span class="fi-name">${f.name}</span>
+      <span class="fi-size">${(f.size/1024).toFixed(1)} KB</span>
+      <button class="fi-remove" onclick="removeFile(${i})">✕</button>
+    </div>`).join('');
+  document.getElementById('build-btn').disabled = uploadedFiles.length === 0;
+  document.getElementById('upload-actions').style.display = uploadedFiles.length ? 'flex' : 'none';
+}
+function removeFile(i) { uploadedFiles.splice(i, 1); renderFileList(); }
+function clearFiles() { uploadedFiles = []; renderFileList(); }
+
+// ===== 索引构建 =====
+async function startBuildIndex() {
+  if (!uploadedFiles.length) return;
+  const card = document.getElementById('build-progress-card');
+  card.style.display = 'block';
+  card.scrollIntoView({behavior:'smooth'});
+  const bar = document.getElementById('build-bar');
+
+  showToast('正在上传文件并构建索引...');
+  document.getElementById('index-result').style.display = 'none';
+
+  // 重置进度步骤样式
+  for (let i = 1; i <= 7; i++) {
+    const el = document.getElementById('step-' + i);
+    el.classList.remove('done', 'running');
+    const dot = el.querySelector('.step-dot');
+    dot.textContent = i;
+  }
+
+  let uploadSuccess = 0, uploadFail = 0;
+
+  // Step 1-2: 上传文件到后端入库
+  document.getElementById('step-1').classList.add('running');
+  bar.style.width = '10%';
+  document.getElementById('progress-pct').textContent = '10%';
+
+  for (let i = 0; i < uploadedFiles.length; i++) {
+    try {
+      const fd = new FormData();
+      fd.append('file', uploadedFiles[i]);
+      const resp = await fetch(API_BASE + '/document/upload', { method: 'POST', body: fd });
+      const data = await resp.json();
+      if (data.success) uploadSuccess++;
+      else uploadFail++;
+    } catch (e) {
+      uploadFail++;
+    }
+    bar.style.width = Math.round(((i + 1) / uploadedFiles.length) * 30) + '%';
+    document.getElementById('progress-pct').textContent = bar.style.width;
+  }
+
+  document.getElementById('step-1').classList.remove('running');
+  document.getElementById('step-1').classList.add('done');
+  document.getElementById('step-1').querySelector('.step-dot').textContent = '\u2713';
+  document.getElementById('step-2').classList.add('running');
+  bar.style.width = '40%';
+  document.getElementById('progress-pct').textContent = '40%';
+  await sleep(400);
+  document.getElementById('step-2').classList.remove('running');
+  document.getElementById('step-2').classList.add('done');
+  document.getElementById('step-2').querySelector('.step-dot').textContent = '\u2713';
+
+  if (uploadFail === uploadedFiles.length) {
+    bar.style.width = '100%';
+    document.getElementById('progress-pct').textContent = '100%';
+    document.getElementById('index-result').style.display = 'block';
+    document.getElementById('index-result').innerHTML = '<div class="ir-error">\u2717 所有文件上传失败，请检查文件格式（支持TXT/JSON）</div>';
+    return;
+  }
+
+  // Step 3-7: 调用后端批量索引
+  try {
+    document.getElementById('step-3').classList.add('running');
+    bar.style.width = '50%';
+    document.getElementById('progress-pct').textContent = '50%';
+
+    const resp = await fetch(API_BASE + '/document/index/batch', { method: 'POST' });
+    const data = await resp.json();
+
+    // 完成剩余步骤动画
+    const remainingSteps = [3, 4, 5, 6, 7];
+    for (const s of remainingSteps) {
+      document.getElementById('step-' + s).classList.remove('running');
+      document.getElementById('step-' + s).classList.add('done');
+      document.getElementById('step-' + s).querySelector('.step-dot').textContent = '\u2713';
+      if (s < 7) {
+        const next = document.getElementById('step-' + (s + 1));
+        if (next) next.classList.add('running');
+      }
+      bar.style.width = Math.round(50 + (s - 2) * 10) + '%';
+      document.getElementById('progress-pct').textContent = bar.style.width;
+      await sleep(300);
+    }
+
+    document.getElementById('step-7').classList.remove('running');
+    document.getElementById('step-7').classList.add('done');
+    document.getElementById('step-7').querySelector('.step-dot').textContent = '\u2713';
+    bar.style.width = '100%';
+    document.getElementById('progress-pct').textContent = '100%';
+
+    document.getElementById('index-result').style.display = 'block';
+    if (data.success) {
+      const total = data.total || 0;
+      const suc = data.successCount || 0;
+      const fail = data.failCount || 0;
+      document.getElementById('index-result').innerHTML =
+        '<div class="ir-title">\u2705 索引构建完成！</div>' +
+        '<div class="ir-row"><span>\u{1F4C4}</span><span>上传文件：' + uploadSuccess + ' 个成功' + (uploadFail ? '，' + uploadFail + ' 个失败' : '') + '</span></div>' +
+        '<div class="ir-row"><span>\u{1F4C4}</span><span>处理文档：' + total + ' 个，成功 ' + suc + ' 个' + (fail ? '，失败 ' + fail + ' 个' : '') + '</span></div>' +
+        (data.messages && data.messages.length ? '<div style="margin-top:8px;font-size:12px;color:#666;">' + data.messages.join('<br>') + '</div>' : '');
+      uploadedFiles = [];
+      renderFileList();
+      if (typeof renderDataset === 'function') renderDataset();
+      loadDashboardStats();
+    } else {
+      document.getElementById('index-result').innerHTML = '<div class="ir-error">\u2717 索引构建失败：' + (data.message || '未知错误') + '</div>';
+    }
+  } catch (e) {
+    bar.style.width = '100%';
+    document.getElementById('progress-pct').textContent = '100%';
+    document.getElementById('index-result').style.display = 'block';
+    document.getElementById('index-result').innerHTML = '<div class="ir-error">\u2717 请求失败：' + e.message + '</div>';
+  }
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function animateBuildSteps(success) {
+  const bar = document.getElementById('build-bar');
+  const steps = [1,2,3,4,5,6,7];
+  const durations = [600,400,800,700,1200,700,500];
+  document.getElementById('index-result').style.display = 'none';
+  let cur = 0;
+  function runStep(i) {
+    if (i >= steps.length) return;
+    const el = document.getElementById('step-' + steps[i]);
+    el.classList.add('running');
+    const pct = Math.round((i / steps.length) * 100);
+    bar.style.width = pct + '%';
+    document.getElementById('progress-pct').textContent = pct + '%';
+    setTimeout(() => {
+      el.classList.remove('running');
+      el.classList.add('done');
+      el.querySelector('.step-dot').textContent = '✓';
+      runStep(i + 1);
+    }, durations[i]);
+  }
+  runStep(0);
+}
+
+function showIndexResult() {
+  const bar = document.getElementById('build-bar');
+  bar.style.width = '100%';
+  document.getElementById('progress-pct').textContent = '100%';
+  const n = uploadedFiles.length || 3;
+  document.getElementById('ir-docs').textContent = '文档数：' + n + ' 篇';
+  document.getElementById('ir-chunks').textContent = '文本分块数：构建中...';
+  document.getElementById('ir-time').textContent = '构建耗时：... 秒';
+  const result = document.getElementById('index-result');
+  result.style.display = 'block';
+  result.innerHTML = '<div class="ir-success">\u2705 索引构建完成！（前端演示模式）</div>';
+  loadDashboardStats();
+}
+
+// ===== 仪表盘数据加载 =====
+function loadDashboardStats() {
+  fetch(API_BASE + '/stats')
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        const docs = data.docCount || 0;
+        const chunks = data.chunkCount || 0;
+        const qa = data.qaCount || 0;
+        const indexed = data.indexedCount || 0;
+
+        document.getElementById('stat-docs').textContent = docs.toLocaleString();
+        document.getElementById('stat-chunks').textContent = chunks.toLocaleString();
+        document.getElementById('stat-qa').textContent = qa.toLocaleString();
+        document.getElementById('stat-acc').textContent = indexed.toLocaleString();
+        document.getElementById('sidebar-doc-count').textContent = indexed.toLocaleString();
+      }
+    })
+    .catch(() => {});
+
+  // 加载最近收录法规（最新8条，不限状态）
+  loadRecentDocs();
+  // 每30秒自动刷新
+  setInterval(loadRecentDocs, 30000);
+}
+
+function loadRecentDocs() {
+  fetch(API_BASE + '/documents?page=1&size=8')
+    .then(r => r.json())
+    .then(data => {
+      const tbody = document.getElementById('recent-docs-tbody');
+      if (!tbody) return;
+      const hint = document.getElementById('recent-refresh-hint');
+      if (data.success && data.documents && data.documents.length > 0) {
+        const statusMap = { 0: '待索引', 1: '已索引', 2: '索引失败' };
+        const statusColor = { 0: 'tag-yellow', 1: 'tag-green', 2: 'tag-red' };
+        const tagColors = ['tag-red', 'tag-blue', 'tag-orange', 'tag-purple', 'tag-teal', 'tag-gray'];
+        tbody.innerHTML = data.documents.map((d, i) => {
+          const cat = d.category || '其他';
+          const tagCls = tagColors[i % tagColors.length];
+          const st = d.status;
+          const fp = d.filePath || '';
+          const sourceCell = (fp.startsWith('http://') || fp.startsWith('https://'))
+            ? '<a href="' + fp + '" target="_blank" title="跳转原文" style="color:#2e7d32;font-size:12px;text-decoration:none;">🌐 原文</a>'
+            : '<span class="tag" style="background:#f5f5f5;color:#999;">手动导入</span>';
+          return '<tr>'
+            + '<td style="font-weight:600;cursor:pointer;color:var(--red-dark);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + escHtml(d.title || '') + '" onclick="showDocModal(' + d.id + ')">' + escHtml(d.title || '-') + '</td>'
+            + '<td style="text-align:center;"><span class="tag ' + tagCls + '">' + escHtml(cat) + '</span></td>'
+            + '<td style="text-align:center;">' + sourceCell + '</td>'
+            + '<td style="text-align:center;"><span class="tag ' + (statusColor[st] || 'tag-gray') + '">' + (statusMap[st] || '未知') + '</span></td>'
+            + '</tr>';
+        }).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#999;padding:20px;">暂无收录数据</td></tr>';
+      }
+      if (hint) {
+        const now = new Date();
+        hint.textContent = '最近刷新 ' + now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0') + ':' + now.getSeconds().toString().padStart(2,'0');
+      }
+    })
+    .catch(() => {
+      const tbody = document.getElementById('recent-docs-tbody');
+      if (tbody && !tbody.querySelector('.load-fail')) {
+        tbody.innerHTML = '<tr><td colspan="4" class="load-fail" style="text-align:center;color:#999;padding:20px;">暂无数据</td></tr>';
+      }
+    });
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ===== 全文检索 =====
+const MOCK_DOCS = [
+  {
+    id:1,title:'中国共产党纪律处分条例（2023年修订版）',
+    category:'纪律法规',org:'中共中央',date:'2023-12-19',chars:42580,
+    content:`第一章 总则\n第一条 为了严肃党的纪律，纯洁党的组织，保障党员民主权利，教育党员遵纪守法，维护党的团结统一，保证党的路线、方针、政策和决议的贯彻执行，根据《中国共产党章程》，制定本条例。\n\n第二条 党的纪律是党的各级组织和全体党员必须遵守的行为规则，是维护党的团结统一、完成党的任务的保证。党组织和党员必须自觉遵守党的纪律，在党纪面前人人平等。\n\n第三条 党的纪律处分工作应当做到事实清楚、证据确凿、定性准确、处理恰当、程序合规、手续完备。\n\n第五章 对违反廉洁纪律行为的处分\n第八十三条 利用职权或者职务上的影响，为本人的配偶、子女及其配偶等亲属和其他特定关系人在审批监管、资源开发、金融信贷、大宗采购、土地使用权出让、房地产开发、工程招投标以及公共财政支出等方面谋取利益，情节较重的，给予警告或者严重警告处分；情节严重的，给予撤销党内职务或者留党察看处分；情节特别严重的，给予开除党籍处分。`,
+    keywords:['纪律','处分','廉洁','警告','开除党籍'],
+    tags:['纪律法规','中共中央','2023']
+  },
+  {
+    id:2,title:'中国共产党章程（二十大修订版）',
+    category:'党章',org:'全国代表大会',date:'2022-10-22',chars:58900,
+    content:`第一章 党员\n第三条 凡年满十八岁的中国工人、农民、军人、知识分子和其他社会阶层的先进分子，承认党的纲领和章程，愿意参加党的一个组织并在其中积极工作、执行党的决议和按期交纳党费的，可以申请加入中国共产党。\n\n第四条 党员享有下列权利：\n（一）参加党的有关会议，阅读党的有关文件，接受党的教育和培训；\n（二）在党的会议上和党报党刊上，参加关于党的政策问题的讨论；\n（三）对党的工作提出建议和倡议；\n（四）在党组织讨论决定对党员的纪律处分或作鉴定时，本人有权参加和进行申辩，其他党员可以为其作证和辩护；\n（五）对党的任何组织和任何党员提出批评，向党的任何一级组织直至中央提出请求、申诉和控告，并要求有关组织给以负责任的答复。\n\n第五条 党员必须履行下列义务：\n（一）认真学习马克思列宁主义、毛泽东思想、邓小平理论、"三个代表"重要思想、科学发展观、习近平新时代中国特色社会主义思想，学习党的路线、方针、政策和决议，学习党的基本知识，学习科学、文化、法律和业务知识，努力提高为人民服务的本领。`,
+    keywords:['党员','义务','权利','申请入党','处分'],
+    tags:['党章','二十大','2022']
+  },
+  {
+    id:3,title:'中国共产党党内监督条例',
+    category:'监督法规',org:'中共中央',date:'2016-10-27',chars:31450,
+    content:`第一章 总则\n第一条 为加强党内监督，保持党的先进性和纯洁性，增强党自我净化、自我完善、自我革新、自我提高能力，确保党始终成为中国特色社会主义事业的坚强领导核心，根据《中国共产党章程》，制定本条例。\n\n第三章 党内监督的内容\n第十四条 党内监督的重点对象是党的领导机关和领导干部，特别是各级领导班子主要负责人。\n\n第十五条 党内监督的内容包括：\n（一）遵守党章党规，维护党中央权威和集中统一领导情况；\n（二）确立和践行社会主义核心价值观，加强思想道德建设情况；\n（三）贯彻党的基本路线，推动经济社会发展情况；\n（四）遵守政治纪律和政治规矩，坚决反对"四风"的情况；\n（五）选拔任用干部是否公正廉洁。`,
+    keywords:['监督','党内监督','纯洁性','先进性','领导干部'],
+    tags:['监督法规','中共中央']
+  },
+  {
+    id:4,title:'中国共产党廉洁自律准则',
+    category:'廉洁法规',org:'中共中央',date:'2015-10-18',chars:8200,
+    content:`第一条 党员领导干部廉洁从政，自觉保持人民公仆本色：\n（一）廉洁从政，自觉远离低级趣味，抵制歪风邪气；\n（二）廉洁用权，不以职务之便为本人或他人谋取不当利益；\n（三）廉洁修身，注重培育健康的生活情趣，不在社会上造成不良影响；\n（四）廉洁齐家，要求配偶、子女及其配偶不利用本人的职权和影响谋取不当利益。\n\n第二条 党员廉洁自律，自觉维护良好的社会风尚：\n（一）坚持公私分明，先公后私，克己奉公；\n（二）坚持崇廉拒腐，清白做人，干净做事；\n（三）坚持尚俭戒奢，艰苦朴素，勤俭节约；\n（四）坚持吃苦在前，享受在后，甘于奉献。`,
+    keywords:['廉洁','自律','领导干部','公私分明','克己奉公'],
+    tags:['廉洁法规','中共中央','2015']
+  },
+  {
+    id:5,title:'党政领导干部选拔任用工作条例',
+    category:'干部管理',org:'中共中央',date:'2019-03-11',chars:36700,
+    content:`第一章 总则\n第一条 为了贯彻新时代党的组织路线，坚持正确用人导向，按照德才兼备、以德为先、五湖四海、任人唯贤的原则，保证党的执政骨干队伍建设，根据《中国共产党章程》等党内法规，制定本条例。\n\n第二章 选拔任用条件\n第六条 提拔担任党政领导职务的，应当具备下列基本条件和资格：\n（一）政治上忠诚坚定，对党忠诚老实，坚定拥护"两个确立"，坚决做到"两个维护"；\n（二）具有与职位要求相适应的理论素养、政治素质、业务能力、文化水平；\n（三）具有正常履行职责的身体条件；\n（四）廉洁自律，清正廉洁；\n（五）具备规定的任职年龄和任职年限。`,
+    keywords:['干部','选拔','任用','德才兼备','廉洁'],
+    tags:['干部管理','中共中央','2019']
+  },
+  {
+    id:6,title:'中国共产党农村基层组织工作条例',
+    category:'组织建设',org:'中共中央',date:'2018-12-30',chars:22300,
+    content:`第一章 总则\n第一条 为了加强和改进农村基层党组织建设，增强政治功能和组织功能，把党的领导贯穿农村工作各方面全过程，根据《中国共产党章程》等党内法规，结合农村工作实际，制定本条例。\n\n第三章 村党组织的主要职责\n第十三条 村党委（党总支、党支部）的主要职责是：\n（一）宣传贯彻执行党的路线方针政策和上级决定，团结带领党员群众完成本村各项任务；\n（二）领导本村农业农村工作，推进乡村振兴，带领群众发展集体经济，维护农民合法权益；\n（三）加强党的建设，严格党的组织生活，推进抓党建促乡村振兴；\n（四）支持和保障村民委员会、村务监督委员会依法依规开展工作。`,
+    keywords:['农村','基层党组织','村党支部','乡村振兴','党的建设'],
+    tags:['组织建设','中共中央','农村']
+  }
+];
+
+let currentFilter = 'all';
+function toggleFilter(el, val) {
+  document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentFilter = val;
+  // 如果搜索框有关键词，自动重新搜索
+  const q = document.getElementById('search-input').value.trim();
+  if (q) doSearch();
+}
+
+function doSearch() {
+  const q = document.getElementById('search-input').value.trim();
+  const container = document.getElementById('search-results');
+  const statsEl = document.getElementById('search-stats');
+  if (!q) { container.innerHTML = '<div class="empty-tip"><div class="et-icon">🔍</div><div class="et-text">请输入关键词</div></div>'; statsEl.style.display='none'; return; }
+  const cat = currentFilter !== 'all' ? currentFilter : '';
+
+  // 优先调用后端API
+  fetch(API_BASE + '/search?keyword=' + encodeURIComponent(q) + '&category=' + encodeURIComponent(cat) + '&topK=20')
+    .then(r => r.json())
+    .then(data => {
+      if (data.success && data.results && data.results.length > 0) {
+        renderSearchResults(data.results, q, data.total, cat);
+      } else {
+        // 后端无结果或失败，降级到本地
+        fallbackSearch(q, cat);
+      }
+    })
+    .catch(() => fallbackSearch(q, cat));
+}
+
+function renderSearchResults(results, q, total, cat) {
+  const container = document.getElementById('search-results');
+  const statsEl = document.getElementById('search-stats');
+  statsEl.style.display = 'block';
+  statsEl.innerHTML = '找到 <strong>' + total + '</strong> 条相关文档，关键词：<strong>' + q + '</strong>';
+
+  const keywords = q.toLowerCase().split(/\s+/);
+  container.innerHTML = '<div class="result-list">' + results.map(doc => {
+    const title = doc.title || '未知';
+    const category = doc.category || '';
+    const maxScore = doc.maxScore || doc.score || 0;
+    const scorePct = Math.min(100, Math.round((maxScore / 30) * 100));
+    const snippet = (doc.snippets && doc.snippets.length) ? doc.snippets[0] : '';
+    return '<div class="result-item" onclick="showDocModal(' + doc.docId + ')">'
+      + '<div class="ri-head"><div class="ri-title">' + title + '</div><div class="ri-score">相关度 ' + scorePct + '%</div></div>'
+      + '<div class="ri-meta"><span>📂 ' + category + '</span></div>'
+      + '<div class="ri-snippet">' + snippet + '</div></div>';
+  }).join('') + '</div>';
+}
+
+function fallbackSearch(q, cat) {
+  const filterCat = cat || currentFilter;
+  const container = document.getElementById('search-results');
+  const statsEl = document.getElementById('search-stats');
+  const keywords = q.toLowerCase().split(/\s+/);
+  let results = MOCK_DOCS.filter(doc => {
+    if (filterCat && filterCat !== 'all' && doc.category !== filterCat) return false;
+    const text = (doc.title + doc.content + doc.keywords.join(' ')).toLowerCase();
+    return keywords.some(k => text.includes(k));
+  });
+  results = results.map(doc => {
+    const text = (doc.title + doc.content).toLowerCase();
+    let score = 0;
+    keywords.forEach(k => {
+      const matches = (text.match(new RegExp(k,'g'))||[]).length;
+      score += matches * (doc.title.toLowerCase().includes(k) ? 3 : 1);
+    });
+    return {...doc, score};
+  }).sort((a,b) => b.score - a.score);
+
+  statsEl.style.display = 'block';
+  statsEl.innerHTML = '找到 <strong>' + results.length + '</strong> 条相关文档' + (filterCat ? '（类别：' + filterCat + '）' : '');
+  if (!results.length) {
+    container.innerHTML = '<div class="empty-tip"><div class="et-icon">🔎</div><div class="et-text">未找到相关法规文档</div></div>';
+    return;
+  }
+  function highlight(text, kws) {
+    let t = text.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+    kws.forEach(k => { t = t.replace(new RegExp(k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'), m => '<em>'+m+'</em>'); });
+    return t;
+  }
+  container.innerHTML = '<div class="result-list">' + results.map(doc => {
+    const snippetRaw = doc.content.substring(0, 200).replace(/\n/g,' ') + '…';
+    const snippet = highlight(snippetRaw, keywords);
+    const titleH = highlight(doc.title, keywords);
+    const maxScore = 30;
+    const scorePct = Math.min(100, Math.round((doc.score/maxScore)*100));
+    return '<div class="result-item" onclick="showDocModal('+doc.id+')">'
+      + '<div class="ri-head"><div class="ri-title">'+titleH+'</div><div class="ri-score">相关度 '+scorePct+'%</div></div>'
+      + '<div class="ri-meta"><span>📂 '+doc.category+'</span><span>🏛 '+doc.org+'</span><span>📝 '+doc.chars.toLocaleString()+' 字</span></div>'
+      + '<div class="ri-snippet">'+snippet+'</div>'
+      + '<div class="ri-tags">'+doc.tags.map(t => '<span class="ri-tag '+(t===doc.category?'red':'')+'">'+t+'</span>').join('')+'</div>'
+      + '</div>';
+  }).join('') + '</div>';
+}
+
+function clearSearch() {
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-results').innerHTML = '<div class="empty-tip"><div class="et-icon">🔍</div><div class="et-text">输入关键词开始检索党内法规文档</div></div>';
+  document.getElementById('search-stats').style.display = 'none';
+}
+
+// ===== 文档模态框 =====
+
+/** 判断 filePath 是否是有效的 http/https 来源链接 */
+function isSourceUrl(fp) {
+  return fp && (fp.startsWith('http://') || fp.startsWith('https://'));
+}
+
+/** 设置来源栏显示/隐藏 */
+function setModalSourceBar(filePath) {
+  const bar = document.getElementById('modal-source-bar');
+  const label = document.getElementById('modal-source-label');
+  const link = document.getElementById('modal-source-link');
+  if (isSourceUrl(filePath)) {
+    bar.style.display = 'flex';
+    label.textContent = filePath;
+    link.href = filePath;
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+/** 渲染正文到 modal-body（HTML优先，降级纯文本） */
+function renderModalBody(content) {
+  const bodyEl = document.getElementById('modal-body');
+  // 注入文章排版样式（只注一次）
+  if (!document.getElementById('modal-article-style')) {
+    const st = document.createElement('style');
+    st.id = 'modal-article-style';
+    st.textContent = [
+      '#modal-body p{margin:0 0 1.4em;text-indent:2em;}',
+      '#modal-body p:first-of-type{font-size:15px;font-weight:500;color:#212121;}',
+      '#modal-body h1,#modal-body h2{font-size:18px;font-weight:700;color:#1a237e;margin:1.4em 0 0.6em;text-indent:0;}',
+      '#modal-body h3,#modal-body h4{font-size:15px;font-weight:700;color:#283593;margin:1.2em 0 0.5em;text-indent:0;}',
+      '#modal-body h5,#modal-body h6{font-size:14px;font-weight:700;color:#3949ab;margin:1em 0 0.4em;text-indent:0;}',
+      '#modal-body ul,#modal-body ol{padding-left:2em;margin:0.4em 0 1.2em;text-indent:0;}',
+      '#modal-body li{margin-bottom:0.5em;line-height:1.8;}',
+      '#modal-body strong,#modal-body b{color:#c62828;font-weight:700;}',
+      '#modal-body em{color:#4a148c;font-style:italic;}',
+      '#modal-body blockquote{border-left:4px solid #1565c0;padding:8px 16px;background:#e3f2fd;margin:1em 0;color:#1a237e;text-indent:0;}',
+      '#modal-body table{border-collapse:collapse;width:100%;margin:1em 0;}',
+      '#modal-body th,#modal-body td{border:1px solid #e0e0e0;padding:8px 12px;font-size:13px;}',
+      '#modal-body th{background:#e8eaf6;font-weight:700;color:#1a237e;}'
+    ].join('');
+    document.head.appendChild(st);
+  }
+  if (!content || content.trim().length === 0) {
+    bodyEl.innerHTML = '<p style="color:#aaa;text-align:center;padding:40px 0;">暂无正文内容</p>';
+    return;
+  }
+  // 含 HTML 标签则直接渲染，否则按段落拆分
+  if (/<[a-z][\s\S]*>/i.test(content)) {
+    bodyEl.innerHTML = content;
+  } else {
+    bodyEl.innerHTML = content.split(/\n{2,}/).map(p =>
+      p.trim() ? '<p>' + escHtml(p.trim()) + '</p>' : ''
+    ).join('') || '<p>' + escHtml(content) + '</p>';
+  }
+}
+
+function showDocModal(id) {
+  fetch(API_BASE + '/document/' + id)
+    .then(r => r.json())
+    .then(data => {
+      if (data.success && data.document) {
+        const d = data.document;
+        document.getElementById('modal-title').textContent = d.title;
+        document.getElementById('modal-meta').innerHTML =
+          '<span>📂 '+(d.category||'')+'</span>' +
+          '<span>🏛 '+(d.org||'')+'</span>' +
+          '<span>📝 '+(d.charCount||0).toLocaleString()+' 字</span>' +
+          '<span>🧩 '+data.chunkCount+' 块</span>';
+        document.getElementById('modal-stats').textContent =
+          '📄 正文共约 ' + (d.charCount||0).toLocaleString() + ' 字  ·  🧩 ' + data.chunkCount + ' 个检索分块';
+        setModalSourceBar(d.filePath || '');
+        // 优先用 htmlContent（HTML渲染），回退到 content（纯文本分段渲染）
+        renderModalBody(d.htmlContent || d.content);
+        document.getElementById('doc-modal').classList.add('open');
+      } else {
+        fallbackShowDocModal(id);
+      }
+    })
+    .catch(() => fallbackShowDocModal(id));
+}
+
+function fallbackShowDocModal(id) {
+  const doc = MOCK_DOCS.find(d => d.id === id);
+  if (!doc) return;
+  document.getElementById('modal-title').textContent = doc.title;
+  document.getElementById('modal-meta').innerHTML =
+    '<span>📂 '+doc.category+'</span>' +
+    '<span>🏛 '+doc.org+'</span>' +
+    '<span>📝 '+doc.chars.toLocaleString()+' 字</span>';
+  document.getElementById('modal-stats').textContent =
+    '📄 正文共约 ' + doc.chars.toLocaleString() + ' 字';
+  setModalSourceBar(doc.filePath || '');
+  renderModalBody(doc.content);
+  document.getElementById('doc-modal').classList.add('open');
+}
+function closeModal() { document.getElementById('doc-modal').classList.remove('open'); }
+
+// ===== 智能问答 =====
+const QA_DATA = {
+  '党员受到警告处分的情形有哪些': {
+    answer: `根据《中国共产党纪律处分条例》的相关规定，党员受到**警告处分**的常见情形包括：\n\n**一、违反政治纪律**\n• 散布、传播政治谣言，危害党和国家安全，情节较轻的\n• 参与有损党的形象的网络言论，情节较轻的\n\n**二、违反廉洁纪律**\n• 利用职权为亲属在审批、采购等方面谋取利益，情节较轻的\n• 违反规定收受礼品、礼金，情节较轻的\n\n**三、违反工作纪律**\n• 在工作中弄虚作假，欺骗上级，情节较轻的\n• 不认真履行职责造成一定损失，情节较轻的\n\n**四、违反生活纪律**\n• 生活腐化，有损党员和党的形象，情节较轻的\n\n⚠️ 注意：警告处分是最轻的党纪处分，期限为12个月，期间停止享有提名、推荐、选举资格。`,
+    sources: [
+      { title: '中国共产党纪律处分条例（2023年修订版）', chapter: '第三章、第五章' },
+      { title: '中国共产党章程', chapter: '第三十九条' }
+    ]
+  },
+  '党员有哪些基本权利': {
+    answer: `根据《中国共产党章程》第四条，党员享有以下基本权利：\n\n1. **参与权**：参加党的有关会议，阅读党的有关文件，接受党的教育和培训\n\n2. **讨论权**：在党的会议和党报党刊上，参加关于党的政策问题的讨论\n\n3. **建议权**：对党的工作提出建议和倡议\n\n4. **申辩权**：在党组织讨论决定纪律处分时，本人有权参加和进行申辩，其他党员可以为其作证和辩护\n\n5. **批评权和申诉权**：对党的任何组织和党员提出批评，向党的任何一级组织直至中央提出请求、申诉和控告\n\n6. **保留意见权**：对党的决议和政策如有不同意见，在坚决执行的前提下，可以保留，并向上级党组织反映\n\n7. **选举权**：在党员大会上有选举权、被选举权和表决权\n\n8. **知情权**：按照规定获得党组织各项帮助和照顾`,
+    sources: [
+      { title: '中国共产党章程（二十大修订版）', chapter: '第四条' }
+    ]
+  },
+  '严重违纪如何处理': {
+    answer: `根据《中国共产党纪律处分条例》，党纪处分分为以下五种，严重违纪情形的处理如下：\n\n**党纪处分的种类（由轻到重）：**\n| 处分类型 | 适用情形 |\n|---------|--------|\n| 警告 | 情节较轻，12个月内停止部分权利 |\n| 严重警告 | 情节较重，18个月内停止部分权利 |\n| 撤销党内职务 | 有职务的，情节严重 |\n| 留党察看 | 情节严重，1-2年，取消党员权利 |\n| 开除党籍 | 情节特别严重，永久取消党籍 |\n\n**严重违纪的典型情形：**\n• **腐败受贿**：利用职务收受贿赂，金额较大的，给予撤销职务至开除党籍处分\n• **贪污挪用**：贪污、挪用公款，给予撤销职务以上处分\n• **生活腐化**：有严重生活腐化行为，影响极坏的，给予开除党籍处分\n• **丧失立场**：在大是大非面前丧失党性，造成恶劣影响的，给予开除党籍处分\n\n**📌 重要原则**：党纪处分应遵循事实清楚、证据确凿、定性准确、处理恰当的原则，既不能拔高，也不能降低。`,
+    sources: [
+      { title: '中国共产党纪律处分条例（2023年修订版）', chapter: '第二章、第三章' },
+      { title: '中国共产党党内监督条例', chapter: '第四章' }
+    ]
+  },
+  '廉洁自律的主要规定': {
+    answer: `根据《中国共产党廉洁自律准则》，廉洁自律的主要规定包括：\n\n**一、领导干部廉洁从政方面**\n• **廉洁从政**：自觉保持人民公仆本色，远离低级趣味，抵制歪风邪气\n• **廉洁用权**：不以职务之便为本人或他人谋取不当利益\n• **廉洁修身**：注重培育健康的生活情趣，不在社会上造成不良影响\n• **廉洁齐家**：要求配偶、子女及其配偶不利用本人职权谋取不当利益\n\n**二、全体党员廉洁自律方面**\n• **公私分明**：先公后私，克己奉公\n• **崇廉拒腐**：清白做人，干净做事\n• **尚俭戒奢**：艰苦朴素，勤俭节约\n• **吃苦在前**：享受在后，甘于奉献\n\n**三、配套纪律处分规定**\n凡违反廉洁自律准则，视情节轻重，按《纪律处分条例》给予相应处分，对于金额较大、影响恶劣的，可给予撤销职务直至开除党籍处分。`,
+    sources: [
+      { title: '中国共产党廉洁自律准则', chapter: '全文' },
+      { title: '中国共产党纪律处分条例（2023年修订版）', chapter: '第五章 廉洁纪律' }
+    ]
+  }
+};
+
+function matchQA(q) {
+  const ql = q.toLowerCase();
+  for (const [key, val] of Object.entries(QA_DATA)) {
+    if (key.split('').filter(c=>ql.includes(c)).length / key.length > 0.4) return val;
+  }
+  return null;
+}
+
+function renderMarkdown(text) {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\|(.+)\|/g, (m) => {
+      const cells = m.split('|').filter(s=>s.trim());
+      return '<tr>' + cells.map(c=>`<td style="padding:4px 10px;border:1px solid #e0e0e0;">${c.trim()}</td>`).join('') + '</tr>';
+    })
+    .replace(/((<tr>.*<\/tr>\n?)+)/g, '<table style="border-collapse:collapse;margin:8px 0;font-size:12.5px;">$1</table>')
+    .replace(/^• (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, '<ul style="margin:4px 0 4px 16px;">$&</ul>')
+    .replace(/^(\d+)\. \*\*(.+?)\*\*：(.+)$/gm, '<p style="margin:6px 0;"><strong>$1. $2</strong>：$3</p>')
+    .replace(/^(\d+)\. \*\*(.+?)\*\*$/gm, '<p style="margin:6px 0;"><strong>$1. $2</strong></p>')
+    .replace(/\n/g, '<br>');
+}
+
+function showTyping() {
+  const msgs = document.getElementById('chat-messages');
+  const id = 'typing-' + Date.now();
+  msgs.insertAdjacentHTML('beforeend', `
+    <div class="msg bot" id="${id}">
+      <div class="avatar">党</div>
+      <div class="bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>
+    </div>`);
+  msgs.scrollTop = msgs.scrollHeight;
+  return id;
+}
+
+function appendBotMsg(text, sources, retrievedDocs) {
+  const msgs = document.getElementById('chat-messages');
+  const srcHtml = sources && sources.length ? `
+    <div class="src-list">
+      <div class="src-title">📎 参考法规来源：</div>
+      ${sources.map(s=>{
+        const did=s.docId?parseInt(s.docId):0;
+        const refIdx=s.refIndex||'';
+        return `<div class="src-item" style="cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;padding:4px 0;" onclick="event.stopPropagation();${did>0?'showDocModal('+did+')':''}">📄 【参考资料${refIdx}】${s.title}${s.chapter ? ' · '+s.chapter : ''}</div>`;
+      }).join('')}
+    </div>` : '';
+  msgs.insertAdjacentHTML('beforeend', `
+    <div class="msg bot fade-in">
+      <div class="avatar">党</div>
+      <div class="bubble">${renderMarkdown(text)}${srcHtml}</div>
+    </div>`);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function appendUserMsg(text) {
+  const msgs = document.getElementById('chat-messages');
+  msgs.insertAdjacentHTML('beforeend', `
+    <div class="msg user fade-in">
+      <div class="avatar">👤</div>
+      <div class="bubble">${text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+    </div>`);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function toggleContextDoc(el) {
+  const full = el.querySelector('.cdi-full');
+  const icon = el.querySelector('.cdi-expand');
+  if (!full) return;
+  const isOpen = full.style.display !== 'none';
+  full.style.display = isOpen ? 'none' : 'block';
+  if (icon) icon.textContent = isOpen ? '展开 ▼' : '收起 ▲';
+}
+
+function updateContextDocs(retrievedDocs, sources) {
+  const list = document.getElementById('context-docs-list');
+  let items = (retrievedDocs && retrievedDocs.length) ? retrievedDocs : (sources || []);
+  if (!items.length) return;
+  // 按 title+chapter 去重，与后端 buildContext / extractSources 逻辑保持一致
+  const seenKeys = new Set();
+  items = items.filter(s => {
+    const title = (s.title || '').trim();
+    const chapter = (s.chapter || '').trim();
+    const key = title + '|||' + chapter;
+    if (!title || seenKeys.has(key)) return false;
+    seenKeys.add(key);
+    return true;
+  });
+  list.innerHTML = items.map((s, i) => {
+    const content = s.content || '';
+    const title = s.title || '';
+    const chapter = s.chapter || '';
+    const score = parseFloat(s.score) || 0;
+    const pct = Math.min(100, Math.round((score / 30) * 100));
+    const color = pct >= 70 ? 'var(--red)' : pct >= 40 ? '#e6a700' : '#999';
+    const excerpt = content.length > 80
+      ? content.substring(0, 80).replace(/\n/g, ' ') + '…'
+      : (chapter || '暂无摘要');
+    const fullHtml = content
+      ? '<div class="cdi-full" style="display:none;margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);font-size:12px;color:#555;line-height:1.7;max-height:220px;overflow-y:auto;white-space:pre-wrap;">' + content.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>'
+      : '';
+    return `
+    <div class="context-doc-item" onclick="toggleContextDoc(this)">
+      <div class="cdi-name">${title}</div>
+      <div class="cdi-score">
+        <span style="display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:20px;border-radius:10px;font-size:11px;font-weight:700;color:#fff;background:${color};padding:0 6px;">${pct}%</span>
+        <div class="cdi-score-bar"><div class="fill" style="width:${pct}%;background:${color};"></div></div>
+      </div>
+      <div class="cdi-excerpt">${excerpt} ${fullHtml ? '<span class="cdi-expand" style="color:var(--red);font-size:11px;cursor:pointer;">展开 ▼</span>' : ''}</div>
+      ${fullHtml}
+    </div>`}).join('');
+}
+
+function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const q = input.value.trim();
+  if (!q) return;
+  input.value = '';
+  appendUserMsg(q);
+  const tid = showTyping();
+  const strategy = document.getElementById('qa-strategy')?.value || 'hybrid';
+  const topK = parseInt(document.getElementById('qa-topk')?.value) || 5;
+  const temperature = (parseInt(document.getElementById('qa-temp')?.value) || 7) / 10;
+
+  // 优先调用后端API
+  fetch(API_BASE + '/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ question: q, strategy: strategy, topK: topK, temperature: temperature })
+  }).then(r => r.json()).then(data => {
+    document.getElementById(tid)?.remove();
+    if (data.success) {
+      appendBotMsg(data.answer, data.sources, data.retrievedDocs);
+      updateContextDocs(data.retrievedDocs, data.sources);
+      if (data.costTime) showToast('RAG 问答完成，耗时 ' + data.costTime + 'ms');
+    } else {
+      // 后端失败，降级到本地演示
+      fallbackQA(q, tid);
+    }
+  }).catch(() => {
+    document.getElementById(tid)?.remove();
+    fallbackQA(q, tid);
+  });
+}
+
+function fallbackQA(q) {
+  const matched = matchQA(q);
+  if (matched) {
+    appendBotMsg(matched.answer, matched.sources);
+    updateContextDocs(null, matched.sources);
+  } else {
+    const genericAnswer = `感谢您的提问！\n\n当前为**演示模式**（后端未连接）。关于"**${q}**"的相关信息：\n\n党内法规体系包括党章、准则、条例、规定、办法、规则、细则等多种形式。\n\n建议启动后端服务以获得真正的RAG智能问答能力。`;
+    appendBotMsg(genericAnswer, []);
+    updateContextDocs([]);
+  }
+  showToast('⚠️ 当前为演示模式，请启动 Spring Boot 后端');
+}
+
+function sendQuickQ(el) {
+  document.getElementById('chat-input').value = el.textContent;
+  sendMessage();
+}
+
+function handleChatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function clearChat() {
+  document.getElementById('chat-messages').innerHTML = `
+    <div class="msg bot">
+      <div class="avatar">党</div>
+      <div class="bubble">对话已清空，欢迎继续提问！🎖️</div>
+    </div>`;
+  document.getElementById('context-docs-list').innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px 0;">发起对话后显示检索到的相关法规文档</div>';
+}
+
+// ===== 数据集列表 =====
+const DATASET_ROWS = [
+  {title:'中国共产党纪律处分条例（2023年修订版）',category:'纪律法规',org:'中共中央',date:'2023-12-19',chars:42580,blocks:296,status:'已索引',content:'第一章 总则\n第一条 为了严肃党的纪律，纯洁党的组织，保障党员民主权利，教育党员遵纪守法，维护党的团结统一，保证党的路线、方针、政策和决议的贯彻执行，根据《中国共产党章程》，制定本条例。\n\n第二条 党的纪律是党的各级组织和全体党员必须遵守的行为规则，是维护党的团结统一、完成党的任务的保证。党组织和党员必须自觉遵守党的纪律，在党纪面前人人平等。\n\n第三条 党的纪律处分工作应当做到事实清楚、证据确凿、定性准确、处理恰当、程序合规、手续完备。'},
+  {title:'中国共产党章程（二十大修订版）',category:'党章',org:'全国代表大会',date:'2022-10-22',chars:58900,blocks:412,status:'已索引',content:'第一章 党员\n第三条 凡年满十八岁的中国工人、农民、军人、知识分子和其他社会阶层的先进分子，承认党的纲领和章程，愿意参加党的一个组织并在其中积极工作、执行党的决议和按期交纳党费的，可以申请加入中国共产党。\n\n第四条 党员享有下列权利：\n（一）参加党的有关会议，阅读党的有关文件，接受党的教育和培训；\n（二）在党的会议上和党报党刊上，参加关于党的政策问题的讨论；\n（三）对党的工作提出建议和倡议；\n（四）在党组织讨论决定对党员的纪律处分或作鉴定时，本人有权参加和进行申辩。'},
+  {title:'中国共产党党内监督条例',category:'监督法规',org:'中共中央',date:'2016-10-27',chars:31450,blocks:220,status:'已索引',content:'第一章 总则\n第一条 为加强党内监督，保持党的先进性和纯洁性，增强党自我净化、自我完善、自我革新、自我提高能力，确保党始终成为中国特色社会主义事业的坚强领导核心，根据《中国共产党章程》，制定本条例。\n\n第十四条 党内监督的重点对象是党的领导机关和领导干部，特别是各级领导班子主要负责人。'},
+  {title:'中国共产党廉洁自律准则',category:'廉洁法规',org:'中共中央',date:'2015-10-18',chars:8200,blocks:58,status:'已索引',content:'第一条 党员领导干部廉洁从政，自觉保持人民公仆本色：\n（一）廉洁从政，自觉远离低级趣味，抵制歪风邪气；\n（二）廉洁用权，不以职务之便为本人或他人谋取不当利益；\n（三）廉洁修身，注重培育健康的生活情趣；\n（四）廉洁齐家，要求配偶、子女及其配偶不利用本人的职权和影响谋取不当利益。'},
+  {title:'党政领导干部选拔任用工作条例',category:'干部管理',org:'中共中央',date:'2019-03-11',chars:36700,blocks:257,status:'已索引',content:'第一章 总则\n第一条 为了贯彻新时代党的组织路线，坚持正确用人导向，按照德才兼备、以德为先、五湖四海、任人唯贤的原则，保证党的执政骨干队伍建设，根据《中国共产党章程》等党内法规，制定本条例。\n\n第六条 提拔担任党政领导职务的，应当具备下列基本条件和资格：\n（一）政治上忠诚坚定，对党忠诚老实；\n（二）具有与职位要求相适应的理论素养、政治素质、业务能力。'},
+  {title:'中国共产党农村基层组织工作条例',category:'组织建设',org:'中共中央',date:'2018-12-30',chars:22300,blocks:157,status:'已索引',content:'第一章 总则\n第一条 为了加强和改进农村基层党组织建设，增强政治功能和组织功能，把党的领导贯穿农村工作各方面全过程，根据《中国共产党章程》等党内法规，结合农村工作实际，制定本条例。\n\n第十三条 村党委（党总支、党支部）的主要职责是：宣传贯彻执行党的路线方针政策和上级决定，团结带领党员群众完成本村各项任务。'},
+  {title:'中国共产党巡视工作条例',category:'监督法规',org:'中共中央',date:'2017-07-17',chars:19800,blocks:139,status:'已索引',content:'第一章 总则\n第一条 为落实全面从严治党要求，加强党内监督，规范巡视工作，根据《中国共产党章程》，制定本条例。\n\n第二条 党的中央和省、自治区、直辖市委员会实行巡视制度，建立专职巡视机构，对所管理的地方、部门、企事业单位党组织进行巡视监督。'},
+  {title:'中国共产党问责条例',category:'纪律法规',org:'中共中央',date:'2022-01-09',chars:12600,blocks:89,status:'已索引',content:'第一条 为了坚持党的领导，加强党的建设，全面从严治党，做到有权必有责、有责要担当、失责必追究，落实党组织管党治党政治责任，督促党的领导干部践行忠诚干净担当，根据《中国共产党章程》，制定本条例。'},
+  {title:'关于新形势下党内政治生活的若干准则',category:'准则',org:'中共中央',date:'2016-10-27',chars:28400,blocks:199,status:'已索引',content:'党内政治生活是党组织教育管理党员和党员进行党性锻炼的主要平台。办好中国的事情，关键在党，关键在党要管党、从严治党。党要管党必须从党内政治生活管起，从严治党必须从党内政治生活严起。\n\n新形势下加强和规范党内政治生活，必须以党章为根本遵循，坚持党的政治路线、思想路线、组织路线、群众路线。'},
+  {title:'中国共产党重大事项请示报告条例',category:'工作条例',org:'中共中央',date:'2019-09-05',chars:15200,blocks:107,status:'待索引',content:'第一条 为了加强和规范重大事项请示报告工作，严明党的政治纪律和组织纪律，保证全党全国服从党中央、政令畅通，根据《中国共产党章程》《关于新形势下党内政治生活的若干准则》等党内法规，制定本条例。'},
+];
+
+const TAG_CLASS = {'纪律法规':'tag-red','党章':'tag-red','监督法规':'tag-blue','廉洁法规':'tag-orange','干部管理':'tag-gray','组织建设':'tag-green','准则':'tag-blue','工作条例':'tag-gray'};
+const STATUS_CLASS = {'已索引':'tag-green','待索引':'tag-orange','索引失败':'tag-red'};
+
+let dsPage = 1;
+const dsPageSize = 10;
+
+function getFilteredDataset() {
+  const q = (document.getElementById('ds-search')?.value || '').trim().toLowerCase();
+  const cat = document.getElementById('ds-cat-filter')?.value || '';
+  const st = document.getElementById('ds-status-filter')?.value || '';
+  return DATASET_ROWS.filter(r => {
+    if (q && !r.title.toLowerCase().includes(q) && !r.content.toLowerCase().includes(q)) return false;
+    if (cat && r.category !== cat) return false;
+    if (st && r.status !== st) return false;
+    return true;
+  });
+}
+
+function renderDataset() {
+  const q = (document.getElementById('ds-search')?.value || '').trim();
+  const cat = document.getElementById('ds-cat-filter')?.value || '';
+  const st = document.getElementById('ds-status-filter')?.value || '';
+
+  fetch(API_BASE + '/documents?page=' + dsPage + '&size=' + dsPageSize
+    + '&keyword=' + encodeURIComponent(q) + '&category=' + encodeURIComponent(cat)
+    + '&status=' + encodeURIComponent(st))
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        renderDatasetTable(data.documents, data.total, data.total);
+      } else {
+        renderDatasetTable(DATASET_ROWS, DATASET_ROWS.length, DATASET_ROWS.length);
+      }
+    })
+    .catch(() => renderDatasetTable(DATASET_ROWS, DATASET_ROWS.length, DATASET_ROWS.length));
+}
+
+function renderDatasetTable(rows, total, allTotal) {
+  document.getElementById('ds-total').textContent = allTotal || total;
+  document.getElementById('ds-filtered-count').textContent = total;
+  const tbody = document.getElementById('dataset-tbody');
+
+  if (!rows || !rows.length) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--muted);">暂无匹配数据</td></tr>';
+    return;
+  }
+
+  const STATUS_MAP = {0:'待索引', 1:'已索引', 2:'索引失败'};
+  tbody.innerHTML = rows.map((r, idx) => {
+    const id = r.id || idx + 1;
+    const status = r.status !== undefined ? STATUS_MAP[r.status] || r.status : (r.statusText || r.status);
+    const chars = r.charCount || r.chars || 0;
+    const fp = r.filePath || '';
+    const sourceCell = (fp.startsWith('http://') || fp.startsWith('https://'))
+      ? '<a href="' + fp + '" target="_blank" title="' + fp + '" style="color:#2e7d32;font-size:13px;text-decoration:none;white-space:nowrap;">🌐 原文</a>'
+      : '<span style="color:#bbb;font-size:12px;">—</span>';
+    return '<tr>'
+      + '<td><input type="checkbox" /></td>'
+      + '<td style="font-weight:600;cursor:pointer;color:var(--red-dark);" onclick="showDocModal('+id+')">' + (r.title || '') + '</td>'
+      + '<td><span class="tag '+(TAG_CLASS[r.category]||'tag-gray')+'">' + (r.category||'') + '</span></td>'
+      + '<td>' + (r.org||'') + '</td>'
+      + '<td>' + (r.publishDate||r.date||'') + '</td>'
+      + '<td>' + chars.toLocaleString() + '</td>'
+      + '<td>' + (r.chunkCount != null ? r.chunkCount : '-') + '</td>'
+      + '<td style="text-align:center;">' + sourceCell + '</td>'
+      + '<td><span class="tag '+(STATUS_CLASS[status]||'tag-gray')+'">' + status + '</span></td>'
+      + '<td><div class="action-btns">'
+      + '<button class="btn btn-secondary btn-sm" onclick="showDocModal('+id+')">查看</button>'
+      + '<button class="btn btn-primary btn-sm" onclick="rebuildIndex('+id+')">重建索引</button>'
+      + '<button class="btn btn-secondary btn-sm" onclick="deleteDatasetRow('+id+')" style="color:#e53935;">删除</button>'
+      + '</div></td></tr>';
+  }).join('');
+
+  // 分页（简化）
+  const totalPages = Math.max(1, Math.ceil(total / dsPageSize));
+  const pagEl = document.getElementById('ds-pagination');
+  if (totalPages <= 1) { pagEl.innerHTML = ''; }
+  else {
+    let btns = '<button class="btn btn-secondary btn-sm" '+(dsPage<=1?'disabled':'')+' onclick="dsPage--;renderDataset()">‹ 上一页</button>';
+    for (let i = 1; i <= totalPages; i++) btns += '<button class="btn '+(i===dsPage?'btn-primary':'btn-secondary')+' btn-sm" onclick="dsPage='+i+';renderDataset()">'+i+'</button>';
+    btns += '<button class="btn btn-secondary btn-sm" '+(dsPage>=totalPages?'disabled':'')+' onclick="dsPage++;renderDataset()">下一页 ›</button>';
+    pagEl.innerHTML = btns;
+  }
+}
+
+function filterDataset() { dsPage = 1; renderDataset(); }
+
+function showDatasetDoc(id) { showDocModal(id); }
+
+function rebuildIndex(id) {
+  showToast('正在为文档ID ' + id + ' 重建索引…');
+  fetch(API_BASE + '/document/index/' + id, { method: 'POST' })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) showToast('✓ 索引重建成功，共 ' + data.chunkCount + ' 个分块');
+      else showToast('✗ 索引重建失败：' + (data.message||''));
+      renderDataset();
+    })
+    .catch(() => {
+      showToast('⚠️ 后端未连接，索引重建失败');
+    });
+}
+
+function deleteDatasetRow(id) {
+  if (!confirm('确定要删除该文档吗？此操作不可撤销。')) return;
+  fetch(API_BASE + '/document/' + id, { method: 'DELETE' })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) showToast('✓ 文档已删除');
+      else showToast('删除失败：' + (data.message||''));
+      renderDataset();
+    })
+    .catch(() => showToast('⚠️ 后端未连接'));
+}
+
+function batchIndex() {
+  if (!confirm('确定要批量索引所有待索引文档吗？\n（已索引的文档不会重复处理）')) return;
+  showToast('正在批量索引…');
+  fetch(API_BASE + '/document/index/batch', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({force: false})
+  })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        showToast('\u2713 批量索引完成，成功 ' + data.successCount + '/' + data.total + '，共 ' + (data.totalChunks||0) + ' 个分块');
+        renderDataset();
+        loadDashboardStats();
+      } else {
+        showToast('批量索引失败：' + (data.message||''));
+      }
+    })
+    .catch(() => showToast('\u26a0\ufe0f 后端未连接'));
+}
+
+/** 强制重建所有文档的索引 */
+function batchRebuildAll() {
+  if (!confirm('⚠️ 确定要强制重建所有文档的索引吗？\n（包括已索引的文档也会重新分块和向量化，可能需要较长时间）')) return;
+  showToast('正在强制重建索引，请耐心等待…');
+  fetch(API_BASE + '/document/index/batch', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({force: true})
+  })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        showToast('\u2713 强制重建完成，成功 ' + data.successCount + '/' + data.total + '，共 ' + (data.totalChunks||0) + ' 个分块');
+        renderDataset();
+        loadDashboardStats();
+      } else {
+        showToast('重建失败：' + (data.message||''));
+      }
+    })
+    .catch(() => showToast('\u26a0\ufe0f 后端未连接'));
+}
+
+// Toast 提示
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--red-dark,#8B0000);color:#fff;padding:10px 24px;border-radius:8px;font-size:13px;z-index:10000;box-shadow:0 4px 16px rgba(0,0,0,.2);animation:fadeIn .3s;pointer-events:none;';
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; setTimeout(() => t.remove(), 300); }, 2500);
+}
+
+// ===== 导入弹窗 =====
+function openImportModal() { document.getElementById('import-modal').classList.add('open'); }
+function closeImportModal() { document.getElementById('import-modal').classList.remove('open'); }
+
+function submitImport() {
+  const title = document.getElementById('import-title').value.trim();
+  const cat = document.getElementById('import-category').value;
+  const org = document.getElementById('import-org').value.trim() || '中共中央';
+  const date = document.getElementById('import-date').value;
+  const content = document.getElementById('import-content').value.trim();
+
+  if (!title) { showToast('请输入法规名称'); return; }
+  if (!cat) { showToast('请选择法规类别'); return; }
+  if (!content) { showToast('请输入法规正文内容'); return; }
+
+  // 调用后端API
+  fetch(API_BASE + '/document/add', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title, category: cat, org, publishDate: date, content })
+  }).then(r => r.json()).then(data => {
+    if (data.success) {
+      showToast('✓「' + title.substring(0,15) + '…」导入成功！文档ID：' + data.docId);
+      clearImportForm();
+      renderDataset();
+      closeImportModal();
+    } else {
+      showToast('导入失败：' + (data.message||''));
+    }
+  }).catch(() => {
+    // 降级到本地
+    const chars = content.length;
+    DATASET_ROWS.unshift({ title, category: cat, org, date: date || new Date().toISOString().split('T')[0], chars, blocks: Math.round(chars/150), status: '待索引', content });
+    clearImportForm();
+    renderDataset();
+    closeImportModal();
+    showToast('✓「' + title.substring(0,15) + '…」已添加到本地（后端未连接）');
+  });
+}
+
+function clearImportForm() {
+  document.getElementById('import-title').value = '';
+  document.getElementById('import-category').value = '';
+  document.getElementById('import-org').value = '';
+  document.getElementById('import-date').value = '';
+  document.getElementById('import-content').value = '';
+}
+
+let importFiles = [];
+function handleImportDrop(e) {
+  e.preventDefault();
+  e.currentTarget.style.borderColor = 'var(--border)';
+  handleImportFiles(e.dataTransfer.files);
+}
+function handleImportFiles(files) {
+  if (!files || !files.length) return;
+  Array.from(files).forEach(f => {
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      let title = f.name.replace(/\.[^.]+$/, '');
+      let content = ev.target.result;
+      let cat = '工作条例';
+      try {
+        const json = JSON.parse(content);
+        title = json.title || title;
+        content = json.content || json.text || content;
+        cat = json.category || cat;
+      } catch(e) {}
+
+      // 调用后端上传API
+      const formData = new FormData();
+      formData.append('file', f);
+      formData.append('category', cat);
+
+      fetch(API_BASE + '/document/upload', { method: 'POST', body: formData })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            showToast('✓ 已上传「' + title.substring(0,15) + '…」');
+            renderDataset();
+          } else {
+            // 降级
+            DATASET_ROWS.unshift({ title, category: cat, org: '导入数据', date: new Date().toISOString().split('T')[0], chars: content.length, blocks: Math.round(content.length/150), status: '待索引', content });
+            renderDataset();
+            showToast('✓「' + title.substring(0,15) + '…」已添加到本地');
+          }
+        })
+        .catch(() => {
+          DATASET_ROWS.unshift({ title, category: cat, org: '导入数据', date: new Date().toISOString().split('T')[0], chars: content.length, blocks: Math.round(content.length/150), status: '待索引', content });
+          renderDataset();
+          showToast('✓「' + title.substring(0,15) + '…」已添加到本地');
+        });
+    };
+    reader.readAsText(f, 'UTF-8');
+  });
+}
+
+renderDataset();
+loadDashboardStats();
+
+// ===== 键盘快捷键 =====
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ==================== 爬虫采集功能 ====================
+
+/** 切换爬虫子面板 */
+function crawlerSwitchTab(tab) {
+  ['preview','single','multi','ai','qa'].forEach(t => {
+    const panel = document.getElementById('crawler-panel-' + t);
+    if (panel) panel.style.display = t === tab ? '' : 'none';
+    const btn = document.getElementById('crawler-tab-' + t);
+    if (btn) {
+      btn.className = t === tab ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm';
+    }
+  });
+}
+
+/** 学习强国预览（只看内容，不入库） */
+function crawlerXuexiPreview() {
+  const url = document.getElementById('crawler-preview-url').value.trim();
+  if (!url) { showToast('请输入学习强国文章URL'); return; }
+
+  const previewBox = document.getElementById('crawler-preview-box');
+  const loading = document.getElementById('crawler-preview-loading');
+  previewBox.style.display = 'none';
+  loading.style.display = 'block';
+  loading.textContent = '⏳ 正在爬取，请稍候…';
+
+  fetch(API_BASE + '/crawler/xuexi/preview', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ url })
+  })
+  .then(r => r.json())
+  .then(res => {
+    loading.style.display = 'none';
+    if (res.success && res.data) {
+      const d = res.data;
+
+      // 标题
+      document.getElementById('crawler-preview-title').textContent = d.title || '（无标题）';
+
+      // 元信息（图标 + 分隔显示）
+      const metaEl = document.getElementById('crawler-preview-meta');
+      const metaItems = [];
+      if (d.publishDate) metaItems.push('📅 ' + d.publishDate);
+      if (d.source)      metaItems.push('🏛 ' + d.source);
+      if (d.url)         metaItems.push('<a href="' + d.url + '" target="_blank" style="color:var(--primary);text-decoration:none;">🔗 查看原文</a>');
+      metaEl.innerHTML = metaItems.join('<span style="color:#ddd">｜</span>');
+
+      // 字数统计
+      const statsEl = document.getElementById('crawler-preview-stats');
+      const charCount = d.content ? d.content.length : 0;
+      statsEl.textContent = '📄 正文约 ' + charCount.toLocaleString() + ' 字';
+
+      // 正文：优先使用 htmlContent 渲染，回退到纯文本
+      const contentEl = document.getElementById('crawler-preview-content');
+      // 统一的内容排版样式
+      const articleStyle = '<style>'
+        + '#crawler-preview-content { font-family:"PingFang SC","Microsoft YaHei",sans-serif; }'
+        + '#crawler-preview-content p { margin:0 0 1.4em; text-indent:2em; }'
+        + '#crawler-preview-content p:first-of-type { font-size:15px; font-weight:500; color:#212121; }'
+        + '#crawler-preview-content h1,#crawler-preview-content h2 { font-size:18px;font-weight:700;color:#1a237e;margin:1.4em 0 0.6em;text-indent:0; }'
+        + '#crawler-preview-content h3,#crawler-preview-content h4 { font-size:15px;font-weight:700;color:#283593;margin:1.2em 0 0.5em;text-indent:0; }'
+        + '#crawler-preview-content h5,#crawler-preview-content h6 { font-size:14px;font-weight:700;color:#3949ab;margin:1em 0 0.4em;text-indent:0; }'
+        + '#crawler-preview-content ul,#crawler-preview-content ol { padding-left:2em;margin:0.4em 0 1.2em;text-indent:0; }'
+        + '#crawler-preview-content li { margin-bottom:0.5em;line-height:1.8; }'
+        + '#crawler-preview-content strong,#crawler-preview-content b { color:#c62828;font-weight:700; }'
+        + '#crawler-preview-content em { color:#4a148c;font-style:italic; }'
+        + '#crawler-preview-content blockquote { border-left:4px solid #1565c0;padding:8px 16px;background:#e3f2fd;margin:1em 0;color:#1a237e;text-indent:0; }'
+        + '#crawler-preview-content table { border-collapse:collapse;width:100%;margin:1em 0; }'
+        + '#crawler-preview-content th,#crawler-preview-content td { border:1px solid #e0e0e0;padding:8px 12px;font-size:13px; }'
+        + '#crawler-preview-content th { background:#e8eaf6;font-weight:700;color:#1a237e; }'
+        + '</style>';
+      if (d.htmlContent && d.htmlContent.trim().length > 0) {
+        contentEl.innerHTML = articleStyle + d.htmlContent;
+      } else {
+        // 纯文本降级：段落换行处理
+        const plain = d.content || '（正文为空）';
+        contentEl.innerHTML = articleStyle + plain.split('\n\n').map(p =>
+          '<p>' + escHtml(p.trim()) + '</p>'
+        ).join('');
+      }
+
+      previewBox.style.display = 'block';
+    } else {
+      showToast('爬取失败：' + (res.message || '未知错误'));
+    }
+  })
+  .catch(() => {
+    loading.style.display = 'none';
+    showToast('请求失败，请确认后端已启动');
+  });
+}
+
+/** 单篇直接入库（不需要预览） */
+function crawlerXuexiSave() {
+  const url = document.getElementById('crawler-single-url').value.trim();
+  if (!url) { showToast('请输入URL'); return; }
+  const category = document.getElementById('crawler-single-category').value;
+
+  if (!confirm('确认将此URL的文章直接入库到「' + category + '」类别？')) return;
+
+  const loading = document.getElementById('crawler-single-loading');
+  loading.style.display = 'block';
+  loading.textContent = '⏳ 正在爬取并入库…';
+
+  fetch(API_BASE + '/crawler/xuexi/save', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ url, category })
+  })
+  .then(r => r.json())
+  .then(res => {
+    loading.style.display = 'none';
+    if (res.success) {
+      showToast('入库成功：「' + res.title + '」已加入数据集');
+      document.getElementById('crawler-single-url').value = '';
+    } else {
+      showToast('入库失败：' + (res.message || '未知错误'));
+    }
+  })
+  .catch(() => {
+    loading.style.display = 'none';
+    showToast('请求失败，请确认后端已启动');
+  });
+}
+
+/** 批量爬取入库 */
+function crawlerXuexiSaveMulti() {
+  const raw = document.getElementById('crawler-multi-urls').value.trim();
+  if (!raw) { showToast('请输入至少一个URL'); return; }
+
+  const urls = raw.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+  if (urls.length === 0) { showToast('未检测到有效URL'); return; }
+
+  const category = document.getElementById('crawler-multi-category').value;
+  const loading = document.getElementById('crawler-multi-loading');
+  const resultBox = document.getElementById('crawler-multi-result');
+  resultBox.style.display = 'none';
+  loading.style.display = 'block';
+  loading.textContent = '⏳ 正在爬取 ' + urls.length + ' 篇文章入库…';
+
+  fetch(API_BASE + '/crawler/xuexi/save-multi', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ urls, category })
+  })
+  .then(r => r.json())
+  .then(res => {
+    loading.style.display = 'none';
+    if (res.success) {
+      let html = '<div style="padding:12px;background:#e8f5e9;border-radius:8px;font-size:13px;">'
+        + '<b>' + res.message + '</b>';
+      if (res.titles && res.titles.length > 0) {
+        html += '<ul style="margin-top:8px;padding-left:20px;color:#333;">';
+        res.titles.forEach(t => { html += '<li>' + t + '</li>'; });
+        html += '</ul>';
+      }
+      html += '</div>';
+      resultBox.innerHTML = html;
+      resultBox.style.display = 'block';
+      showToast(res.message);
+    } else {
+      showToast('批量入库失败：' + (res.message || '未知错误'));
+    }
+  })
+  .catch(() => {
+    loading.style.display = 'none';
+    showToast('请求失败，请确认后端已启动');
+  });
+}
+
+// ==================== AI 分析功能 ====================
+
+/** 单篇 AI 分析 */
+function crawlerAiAnalyze() {
+  const url = document.getElementById('crawler-ai-url').value.trim();
+  if (!url) { showToast('请输入学习强国文章URL'); return; }
+
+  const loading = document.getElementById('crawler-ai-loading');
+  const resultBox = document.getElementById('crawler-ai-result');
+  resultBox.style.display = 'none';
+  loading.style.display = 'block';
+  loading.textContent = '⏳ 正在爬取并 AI 分析，请稍候（大模型生成需要几秒）…';
+
+  fetch(API_BASE + '/crawler/xuexi/analyze', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ url })
+  })
+  .then(r => r.json())
+  .then(res => {
+    loading.style.display = 'none';
+    if (res.success) {
+      renderAiResult([res], false);
+    } else {
+      showToast('AI 分析失败：' + (res.message || '未知错误'));
+    }
+  })
+  .catch(() => {
+    loading.style.display = 'none';
+    showToast('请求失败，请确认后端已启动');
+  });
+}
+
+/** 批量 AI 分析 */
+function crawlerAiAnalyzeMulti() {
+  const raw = document.getElementById('crawler-ai-urls').value.trim();
+  if (!raw) { showToast('请输入至少一个URL'); return; }
+
+  const urls = raw.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+  if (urls.length === 0) { showToast('未检测到有效URL'); return; }
+
+  const loading = document.getElementById('crawler-ai-loading');
+  const resultBox = document.getElementById('crawler-ai-result');
+  resultBox.style.display = 'none';
+  loading.style.display = 'block';
+  loading.textContent = '⏳ 正在批量爬取并 AI 分析 ' + urls.length + ' 篇文章…';
+
+  fetch(API_BASE + '/crawler/xuexi/analyze-multi', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ urls })
+  })
+  .then(r => r.json())
+  .then(res => {
+    loading.style.display = 'none';
+    if (res.success) {
+      showToast(res.message);
+      if (res.items && res.items.length > 0) {
+        renderAiResult(res.items, true);
+      }
+    } else {
+      showToast('批量分析失败：' + (res.message || '未知错误'));
+    }
+  })
+  .catch(() => {
+    loading.style.display = 'none';
+    showToast('请求失败，请确认后端已启动');
+  });
+}
+
+/** 渲染 AI 分析结果 */
+function renderAiResult(items, isBatch) {
+  const resultBox = document.getElementById('crawler-ai-result');
+  let html = '';
+
+  if (isBatch) {
+    html += '<div style="padding:10px 14px;background:#e3f2fd;border-radius:8px;font-size:13px;margin-bottom:12px;">'
+      + '共分析 ' + items.length + ' 篇文章</div>';
+  }
+
+  // 类别对应的颜色映射
+  const catColorMap = {
+    '党章': { bg: '#fdecea', color: '#c62828' },
+    '纪律法规': { bg: '#e8f5e9', color: '#2e7d32' },
+    '监督法规': { bg: '#e3f2fd', color: '#1565c0' },
+    '廉洁法规': { bg: '#fce4ec', color: '#ad1457' },
+    '干部管理': { bg: '#fff3e0', color: '#e65100' },
+    '组织建设': { bg: '#f3e5f5', color: '#6a1b9a' },
+    '组织法规': { bg: '#f3e5f5', color: '#6a1b9a' },
+    '宣传法规': { bg: '#e0f7fa', color: '#00695c' },
+    '党务管理': { bg: '#f1f8e9', color: '#558b2f' },
+    '准则': { bg: '#fbe9e7', color: '#bf360c' },
+    '工作条例': { bg: '#e8eaf6', color: '#283593' },
+    '其他': { bg: '#f5f5f5', color: '#616161' }
+  };
+
+  items.forEach((item, idx) => {
+    const a = item.analysis || {};
+    const category = a.category || '其他';
+    const categoryReason = a.categoryReason || '';
+    const summary = a.summary || '（无摘要）';
+    const keywords = a.keywords || [];
+    const keyPoints = a.keyPoints || [];
+    const catStyle = catColorMap[category] || catColorMap['其他'];
+
+    html += '<div style="border:1.5px solid var(--border);border-radius:10px;padding:18px;margin-bottom:' + (isBatch ? '14px' : '0') + ';background:#fff;">';
+
+    // 标题区
+    html += '<div style="margin-bottom:12px;">';
+    if (isBatch) html += '<span style="display:inline-block;background:var(--primary);color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;margin-right:8px;">第' + (idx + 1) + '篇</span>';
+    html += '<span style="font-weight:700;font-size:15px;">' + (item.title || '未知标题') + '</span>';
+    // 分类标签
+    html += ' <span style="display:inline-block;background:' + catStyle.bg + ';color:' + catStyle.color + ';border-radius:12px;padding:3px 12px;font-size:12px;font-weight:600;margin-left:8px;">📂 ' + escHtml(category) + '</span>';
+    html += '</div>';
+
+    // 元信息
+    const metaParts = [];
+    if (item.publishDate) metaParts.push(item.publishDate);
+    if (item.source) metaParts.push('来源：' + item.source);
+    if (item.url) metaParts.push('<a href="' + item.url + '" target="_blank" style="color:var(--primary);">查看原文</a>');
+    if (metaParts.length > 0) {
+      html += '<div style="font-size:12px;color:var(--muted);margin-bottom:14px;">' + metaParts.join(' &nbsp;|&nbsp; ') + '</div>';
+    }
+
+    // 分类理由
+    if (categoryReason) {
+      html += '<div style="margin-bottom:14px;">'
+        + '<div style="font-weight:700;font-size:13px;color:#6a1b9a;margin-bottom:6px;">📂 分类理由</div>'
+        + '<div style="font-size:13px;color:var(--text);line-height:1.8;padding:10px 14px;background:#f3e5f5;border-radius:7px;">' + escHtml(categoryReason) + '</div></div>';
+    }
+
+    // 摘要
+    html += '<div style="margin-bottom:14px;">'
+      + '<div style="font-weight:700;font-size:13px;color:#e65100;margin-bottom:6px;">📝 摘要</div>'
+      + '<div style="font-size:13px;color:var(--text);line-height:1.8;padding:10px 14px;background:#fff8e1;border-radius:7px;">' + summary + '</div></div>';
+
+    // 关键词
+    if (keywords.length > 0) {
+      html += '<div style="margin-bottom:14px;">'
+        + '<div style="font-weight:700;font-size:13px;color:#1565c0;margin-bottom:6px;">🏷 关键词</div>'
+        + '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+      keywords.forEach(kw => {
+        html += '<span style="display:inline-block;background:#e3f2fd;color:#1565c0;border-radius:12px;padding:3px 12px;font-size:12px;">' + kw + '</span>';
+      });
+      html += '</div></div>';
+    }
+
+    // 知识点
+    if (keyPoints.length > 0) {
+      html += '<div style="margin-bottom:4px;">'
+        + '<div style="font-weight:700;font-size:13px;color:#2e7d32;margin-bottom:6px;">💡 关键知识点</div>'
+        + '<ul style="padding-left:18px;font-size:13px;color:var(--text);line-height:2;">';
+      keyPoints.forEach(kp => {
+        html += '<li>' + kp + '</li>';
+      });
+      html += '</ul></div>';
+    }
+
+    html += '</div>';
+  });
+
+  resultBox.innerHTML = html;
+  resultBox.style.display = 'block';
+}
+
+// ==================== 生成问答对功能 ====================
+
+/** 生成问答对 */
+function crawlerGenerateQa() {
+  const url = document.getElementById('crawler-qa-url').value.trim();
+  if (!url) { showToast('请输入学习强国文章URL'); return; }
+
+  const loading = document.getElementById('crawler-qa-loading');
+  const resultBox = document.getElementById('crawler-qa-result');
+  resultBox.style.display = 'none';
+  loading.style.display = 'block';
+  loading.textContent = '⏳ 正在爬取并生成问答对，请稍候（大模型生成需要几秒）…';
+
+  fetch(API_BASE + '/crawler/xuexi/generate-qa', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ url })
+  })
+  .then(r => r.json())
+  .then(res => {
+    loading.style.display = 'none';
+    if (res.success) {
+      renderQaResult(res);
+    } else {
+      showToast('生成问答对失败：' + (res.message || '未知错误'));
+    }
+  })
+  .catch(() => {
+    loading.style.display = 'none';
+    showToast('请求失败，请确认后端已启动');
+  });
+}
+
+/** 渲染问答对结果 */
+function renderQaResult(res) {
+  const resultBox = document.getElementById('crawler-qa-result');
+  const qaPairs = res.qaPairs || [];
+
+  let html = '<div style="border:1.5px solid var(--border);border-radius:10px;padding:18px;background:#fff;">';
+
+  // 标题
+  html += '<div style="margin-bottom:14px;">'
+    + '<span style="font-weight:700;font-size:15px;">' + (res.title || '未知标题') + '</span>';
+  const metaParts = [];
+  if (res.publishDate) metaParts.push(res.publishDate);
+  if (res.source) metaParts.push('来源：' + res.source);
+  if (res.url) metaParts.push('<a href="' + res.url + '" target="_blank" style="color:var(--primary);">查看原文</a>');
+  if (metaParts.length > 0) {
+    html += '<div style="font-size:12px;color:var(--muted);margin-top:4px;">' + metaParts.join(' &nbsp;|&nbsp; ') + '</div>';
+  }
+  html += '</div>';
+
+  // 统计
+  html += '<div style="padding:6px 14px;background:#e8f5e9;border-radius:6px;font-size:12px;color:#2e7d32;margin-bottom:14px;display:inline-block;">'
+    + '✅ 共生成 ' + qaPairs.length + ' 组问答对</div>';
+
+  // 问答对列表
+  if (qaPairs.length === 0) {
+    html += '<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">未生成问答对，可能文章内容过短</div>';
+  } else {
+    qaPairs.forEach((pair, idx) => {
+      html += '<div style="margin-bottom:12px;padding:14px;background:#f5f7fa;border-radius:8px;border-left:3px solid var(--primary);">'
+        + '<div style="font-weight:700;font-size:13px;color:#c62828;margin-bottom:6px;">Q' + (idx + 1) + '：' + (pair.question || '') + '</div>'
+        + '<div style="font-size:13px;color:var(--text);line-height:1.8;">A：' + (pair.answer || '') + '</div>'
+        + '</div>';
+    });
+  }
+
+  html += '</div>';
+  resultBox.innerHTML = html;
+  resultBox.style.display = 'block';
+}
+</script>
+</body>
+</html>

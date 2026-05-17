@@ -1,0 +1,40 @@
+server:
+  port: 8088  # 内嵌Tomcat端口
+
+spring:
+  datasource: # 数据库连接，自动注入 DataSource Bean
+    url: jdbc:mysql://localhost:3306/party_regulation_db?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: YOUR_MYSQL_PASSWORD
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis-plus:
+  type-aliases-package: com.party.regulation.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# ===== LLM 配置（阿里云百炼） =====
+llm:
+  api-key: YOUR_DASHSCOPE_API_KEY
+  api-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+  model: qwen-plus
+  embedding-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+  embedding-model: text-embedding-v3
+  temperature: 0.7    # 问答回复的随机性（越高越发散）
+  max-tokens: 2000
+  vector-threshold: 0.3  # 向量相似度阈值，低于此值的结果丢弃
+  # 文章分析专用参数
+  extract-temperature: 0.3 # AI分析用更低温度，结果更稳定
+  extract-max-length: 3000 # 送给AI分析的文章最大字符数
+# Lucene 索引存储目录
+# ===== 索引配置 =====
+index:
+  chunk-size: 500
+  chunk-overlap: 100
+  lucene-path: ./data/lucene # Lucene倒排索引存在这里
+  faiss-path: ./data/faiss # 向量映射文件存在这里
+
+logging:
+  level:
+    com.party.regulation: DEBUG

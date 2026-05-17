@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>党内法规智能问答系统 · 项目流程图（完整版）</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:"Microsoft YaHei","SimHei",sans-serif;
+  background:#f5f6f8; padding:30px 20px;
+}
+.nav {
+  display:flex; justify-content:center; gap:10px;
+  margin-bottom:35px; flex-wrap:wrap;
+}
+.nav a {
+  text-decoration:none; padding:8px 18px;
+  border-radius:20px; background:#fff; color:#555;
+  font-size:13px; border:1.5px solid #ddd;
+  transition:all .2s;
+}
+.nav a:hover, .nav a.active {
+  background:#2c3e50; color:#fff; border-color:#2c3e50;
+}
+.figure {
+  max-width:1100px; margin:0 auto 50px;
+  background:#fff; border-radius:14px;
+  box-shadow:0 4px 20px rgba(0,0,0,.06);
+  overflow:hidden;
+}
+.figure .title {
+  background:linear-gradient(135deg,#2c3e50,#34495e);
+  color:#fff; padding:16px 28px; font-size:18px;
+  font-weight:bold; letter-spacing:1px;
+}
+.figure .content { padding:25px; }
+.mermaid { text-align:center; }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <a href="#fig1" class="active">图一 · 系统整体架构</a>
+  <a href="#fig2">图二 · RAG问答流程</a>
+  <a href="#fig3">图三 · 文档入库与索引</a>
+  <a href="#fig4">图四 · 双路召回+RRF</a>
+  <a href="#fig5">图五 · 爬虫模块流程</a>
+  <a href="#fig6">图六 · 项目文件结构</a>
+</div>
+
+<!-- ================== 图一 · 系统整体架构 ================== -->
+<div class="figure" id="fig1">
+  <div class="title">图一 · 系统整体架构</div>
+  <div class="content">
+<div class="mermaid">
+graph TB
+    subgraph 前端层["🖥️ 前端层 (Vue.js)"]
+      A1[问答页面]
+      A2[文档管理]
+      A3[爬虫采集]
+      A4[系统监控]
+    end
+
+    subgraph 接口层["📡 接口层 (Spring Boot Controller)"]
+      B1["RagController<br/>/api/rag/*"]
+      B2["SearchController<br/>/api/search/*"]
+      B3["DatasetController<br/>/api/dataset/*"]
+      B4["CrawlerController<br/>/api/crawler/*"]
+    end
+
+    subgraph 业务层["⚙️ 业务层 (Service)"]
+      C1[RagService]
+      C2[LuceneService]
+      C3[EmbeddingService]
+      C4[CrawlerService]
+      C5[ChunkService]
+      C6[LlmExtractService]
+    end
+
+    subgraph 数据处理层["🔧 数据处理层"]
+      D1[Lucene BM25全文索引]
+      D2[向量嵌入计算<br/>余弦相似度]
+      D3[RRF结果融合排序]
+      D4[文档分块处理]
+    end
+
+    subgraph 存储层["💾 存储层"]
+      E1[(MySQL 8.0<br/>文档/分块/配置)]
+      E2[(Lucene索引文件)]
+      E3[(JSON向量文件<br/>data/faiss/)]
+    end
+
+    subgraph 外部服务["🌐 外部服务"]
+      F1[(阿里云百炼<br/>qwen-plus)]
+      F2[(阿里云百炼<br/>text-embedding-v3)]
+      F3[(学习强国<br/>boot-source.xuexi.cn)]
+    end
+
+    A1 --> B1
+    A2 --> B2 & B3
+    A3 --> B4
+    A4 --> B2 & B3
+
+    B1 --> C1
+    B2 --> C2
+    B3 --> C3 & C5
+    B4 --> C4
+
+    C1 --> D2 & D3
+    C2 --> D1
+    C3 --> D2
+    C4 --> D4
+    C5 --> D4
+    C6 --> F1
+
+    D1 --> E2
+    D2 --> E3
+    D3 --> E1
+    D4 --> E1
+
+    C1 --> F1
+    C3 --> F2
+    C4 --> F3
+
+    style 前端层 fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style 接口层 fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style 业务层 fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    style 数据处理层 fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style 存储层 fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    style 外部服务 fill:#e0f2f1,stroke:#00796b,stroke-width:2px
+</div>
+  </div>
+</div>
+
+<!-- ================== 图二 · RAG问答完整流程 ================== -->
+<div class="figure" id="fig2">
+  <div class="title">图二 · RAG 问答完整流程</div>
+  <div class="content">
+<div class="mermaid">
+sequenceDiagram
+    autonumber
+    participant U as 用户
+    participant F as 前端页面
+    participant RC as RagController
+    participant RS as RagService
+    participant ES as EmbeddingService
+    participant LS as LuceneService
+    participant LLM as 阿里云百炼<br/>qwen-plus
+
+    U->>F: 输入问题"党员领导干部能否经商？"
+    F->>RC: POST /api/rag/chat<br/>{question, topK}
+    RC->>RS: invokeRag(question, topK)
+
+    RS->>ES: getEmbedding(question)
+    ES->>LLM: 调用 text-embedding-v3
+    LLM-->>ES: 返回 1024维向量
+    ES-->>RS: 返回向量表示
+
+    par 并行双路召回
+      RS->>LS: fullTextSearch(question, k)
+      LS-->>RS: 返回 BM25 Top-K 结果
+    and
+      RS->>RS: cosineSimilarity(查询向量, 文档向量池)
+      RS-->>RS: 返回 向量 Top-K 结果
+    end
+
+    RS->>RS: RRF融合排序<br/>score = Σ 1/(k+rank)
+
+    alt 召回结果为空
+      RS-->>RC: 返回"未检索到相关法规"
+      RC-->>F: {answer, sources:[]}
+    else 召回结果有效
+      RS->>LLM: 构造Prompt<br/>(问题 + 检索上下文)
+      LLM-->>RS: 生成带引用的回答
+      RS-->>RC: {answer, sources, usedChunks}
+      RC-->>F: JSON响应
+      F->>U: 展示答案 + 来源标注
+    end
+
+    F->>RC: POST /api/rag/history<br/>保存问答记录
+</div>
+  </div>
+</div>
+
+<!-- ================== 图三 · 文档入库与索引构建 ================== -->
+<div class="figure" id="fig3">
+  <div class="title">图三 · 文档入库与索引构建流程</div>
+  <div class="content">
+<div class="mermaid">
+flowchart LR
+    A([开始]) --> B{来源类型?}
+
+    B -->|学习强国爬虫| C1[调用CrawlerService<br/>解析文章ID/URL]
+    B -->|手动录入| C2[填写表单信息<br/>title/category/org]
+    B -->|文件上传| C3[上传Word/TXT/PDF<br/>提取纯文本]
+
+    C1 --> D[RegulationDocument<br/>存入MySQL]
+    C2 --> D
+    C3 --> D
+
+    D --> E{需要立即<br/>构建索引?}
+
+    E -->|否| F[(等待批量<br/>索引任务)]
+    E -->|是| G[ChunkService<br/>执行文档分块]
+
+    G --> H{分块策略}
+    H -->|按段落| I1[以空行分隔<br/>保留段落完整性]
+    H -->|按字数| I2[固定512字/块<br/>50字重叠]
+
+    I1 --> J[RegulationChunk<br/>分块写入MySQL]
+    I2 --> J
+
+    J --> K[并行构建双路索引]
+
+    subgraph Lucene索引["🔍 Lucene全文索引"]
+      K --> L1[SmartChineseAnalyzer<br/>中文分词]
+      L1 --> L2[写入IndexWriter<br/>title + content字段]
+      L2 --> L3[(Lucene索引文件<br/>data/lucene/)]
+    end
+
+    subgraph 向量索引["📐 向量索引"]
+      K --> M1[EmbeddingService<br/>调用text-embedding-v3]
+      M1 --> M2[1024维向量<br/>内存HashMap存储]
+      M2 --> M3[(JSON持久化<br/>data/faiss/*.json)]
+    end
+
+    L3 --> N([结束])
+    M3 --> N
+
+    style A fill:#90caf9,stroke:#1565c0,stroke-width:2px
+    style N fill:#a5d6a7,stroke:#2e7d32,stroke-width:2px
+    style B fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style E fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style H fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+</div>
+  </div>
+</div>
+
+<!-- ================== 图四 · 双路召回+RRF融合 ================== -->
+<div class="figure" id="fig4">
+  <div class="title">图四 · 双路召回 + RRF 融合排序</div>
+  <div class="content">
+<div class="mermaid">
+flowchart TB
+    A([用户提问]) --> B[EmbeddingService<br/>生成查询向量]
+
+    B --> C1[Lucene BM25<br/>全文检索通道]
+    B --> C2[余弦相似度<br/>向量检索通道]
+
+    subgraph BM25路["🔍 BM25 全文检索"]
+      C1 --> D1[SmartChineseAnalyzer<br/>分词解析]
+      D1 --> D2[MultiFieldQueryParser<br/>title+content检索]
+      D2 --> D3[IndexSearcher.search<br/>获取Top-K文档]
+      D3 --> D4["结果集 A<br/>[(doc1, bm25Score), ...]"]
+    end
+
+    subgraph 向量路["📐 向量语义检索"]
+      C2 --> E1[加载全部文档向量<br/>HashMap id,vector]
+      E1 --> E2[遍历计算余弦相似度<br/>cos=a·b/|a||b|]
+      E2 --> E3[按相似度降序<br/>取Top-K]
+      E3 --> E4["结果集 B<br/>[(doc2, vecScore), ...]"]
+    end
+
+    D4 --> F[RRF 融合排序]
+    E4 --> F
+
+    F --> G["RRF Score = Σ 1/(k + rank_i)<br/>k=60 平滑参数"]
+    G --> H{结果去重<br/>合并同一文档}
+
+    H --> I[按RRF分数降序<br/>取最终Top-K]
+    I --> J["输出: 融合后的<br/>检索上下文 chunks"]
+    J --> K([拼接Prompt<br/>送入LLM生成答案])
+
+    style A fill:#90caf9,stroke:#1565c0,stroke-width:2px
+    style K fill:#a5d6a7,stroke:#2e7d32,stroke-width:2px
+    style H fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+</div>
+  </div>
+</div>
+
+<!-- ================== 图五 · 爬虫模块流程 ================== -->
+<div class="figure" id="fig5">
+  <div class="title">图五 · 爬虫模块流程</div>
+  <div class="content">
+<div class="mermaid">
+flowchart TB
+    A([用户输入<br/>文章URL/ID]) --> B{CrawlerService<br/>解析输入格式}
+
+    B -->|lgpage格式<br/>id=xxx| C1[提取文章ID]
+    B -->|短链接格式<br/>/hash.html| C2[正则提取hash<br/>映射文章ID]
+
+    C1 --> D[构造API请求<br/>boot-source.xuexi.cn/data/app/{id}.js]
+    C2 --> D
+
+    D --> E[OkHttp发送GET请求]
+    E --> F{响应状态}
+
+    F -->|成功| G[解析JSONP回调<br/>提取title/content]
+    F -->|失败| H[返回错误信息<br/>URL无效或网络异常]
+    H --> Z([结束])
+
+    G --> I[Jsoup HTML净化<br/>去除标签/保留正文]
+
+    I --> J{用户选择操作}
+
+    J -->|预览| K1[返回标题+正文摘要<br/>不写入数据库]
+    J -->|单篇入库| K2[存入regulation_document<br/>状态: 待索引]
+    J -->|批量入库| K3[并发请求+批量插入<br/>返回入库统计]
+    J -->|AI分析| K4[LlmExtractService<br/>调用qwen-plus]
+    J -->|生成问答对| K5[LlmExtractService<br/>生成3-5组Q&A]
+
+    K4 --> L1["输出: 摘要/关键词/<br/>核心知识点/学习要点"]
+    K5 --> L2["输出: Q&A JSON数组<br/>可用于微调训练"]
+
+    K2 --> M[触发文档分块<br/>进入索引构建流程]
+    K3 --> M
+    M --> Z
+
+    K1 --> Z
+    L1 --> Z
+    L2 --> Z
+
+    style A fill:#90caf9,stroke:#1565c0,stroke-width:2px
+    style Z fill:#a5d6a7,stroke:#2e7d32,stroke-width:2px
+    style F fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style J fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+</div>
+  </div>
+</div>
+
+<!-- ================== 图六 · 项目文件结构 ================== -->
+<div class="figure" id="fig6">
+  <div class="title">图六 · 项目文件结构</div>
+  <div class="content">
+<div class="mermaid">
+graph TD
+    ROOT["📁 d:/bishe/<br/>党内法规智能问答系统"] --> B["📁 backend/<br/>Spring Boot 项目"]
+    ROOT --> F["📄 index.html<br/>Vue前端单页"]
+    ROOT --> G["📁 generated-images/<br/>AI生成图片"]
+
+    B --> B1["📁 src/main/java/com/rag/demo/"]
+    B --> B2["📁 src/main/resources/"]
+    B --> B3["📄 pom.xml<br/>Maven依赖"]
+
+    B1 --> C1["📁 config/"] & C2["📁 controller/"] & C3["📁 service/"] & C4["📁 entity/"] & C5["📁 mapper/"] & C6["📁 util/"]
+
+    C1 --> D1["CorsConfig.java"] & D2["IndexProperties.java"] & D3["LlmProperties.java"]
+    C2 --> D4["RagController.java"] & D5["SearchController.java"] & D6["DatasetController.java"] & D7["CrawlerController.java"]
+    C3 --> D8["RagService.java"] & D9["LuceneService.java"] & D10["EmbeddingService.java"] & D11["CrawlerService.java"]
+    C4 --> D12["RegulationDocument.java"] & D13["RegulationChunk.java"] & D14["QaHistory.java"]
+    C5 --> D15["RegulationDocumentMapper.java"] & D16["RegulationChunkMapper.java"]
+    C6 --> D17["EmbeddingUtil.java"] & D18["CosineUtil.java"]
+
+    B2 --> E1["application.yml<br/>数据库/百炼API配置"] & E2["mapper/*.xml<br/>MyBatis映射文件"]
+
+    style ROOT fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style B fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style B1 fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+</div>
+  </div>
+</div>
+
+<script>
+mermaid.initialize({
+  startOnLoad:true,
+  theme:'default',
+  flowchart:{ useMaxWidth:true, htmlLabels:true, curve:'basis' },
+  sequence:{ useMaxWidth:true, wrap:true }
+});
+document.querySelectorAll('.nav a').forEach(a=>{
+  a.addEventListener('click',function(){
+    document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

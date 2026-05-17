@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>党内法规智能问答系统 · 项目流程图</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:"Microsoft YaHei","SimSun",sans-serif;
+  background:#f5f7fa; padding:25px 16px;
+}
+.nav {
+  display:flex; justify-content:center; gap:8px;
+  margin-bottom:30px; flex-wrap:wrap;
+}
+.nav a {
+  text-decoration:none; padding:7px 16px;
+  border-radius:18px; background:#fff; color:#555;
+  font-size:12px; border:1.5px solid #ddd; transition:all .2s;
+}
+.nav a:hover, .nav a.active { background:#2c3e50; color:#fff; border-color:#2c3e50; }
+
+.figure {
+  max-width:1100px; margin:0 auto 55px;
+  background:#fff; border-radius:12px;
+  box-shadow:0 3px 15px rgba(0,0,0,.07); overflow:hidden;
+}
+.fig-title {
+  background:linear-gradient(135deg,#1a237e,#303f9f);
+  color:#fff; padding:14px 24px; font-size:17px;
+  font-weight:bold; letter-spacing:1px;
+}
+.fig-content { padding:22px; }
+
+/* ===== 核心架构图样式 ===== */
+.arch-table { width:100%; border-collapse:separate; border-spacing:0 8px; }
+.arch-row td { position:relative; }
+
+/* 左侧层级标签 */
+.layer-label {
+  width:72px; text-align:center; vertical-align:middle;
+  padding:14px 4px !important; font-weight:bold;
+  color:#fff; font-size:13px; letter-spacing:2px;
+  writing-mode:vertical-lr; text-orientation:upright;
+  border-radius:8px 0 0 8px;
+}
+
+/* 右侧内容区 */
+.layer-body {
+  padding:12px 18px; display:flex;
+  flex-wrap:wrap; gap:8px; align-items:center;
+  border-radius:0 8px 8px 0;
+  min-height:56px;
+}
+
+/* 白色小卡片 */
+.card {
+  background:#fff; border:1.5px solid #e0e0e0;
+  border-radius:8px; padding:9px 14px;
+  font-size:12.5px; color:#333;
+  text-align:center; white-space:nowrap;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+  transition:all .15s; cursor:default;
+}
+.card:hover { transform:translateY(-1px); box-shadow:0 3px 10px rgba(0,0,0,.12); border-color:#bbb; }
+.card .card-title { font-weight:bold; color:#222; display:block;margin-bottom:1px; }
+.card .card-sub { font-size:11px; color:#888; display:block; }
+
+/* 层间箭头 */
+.layer-arrow {
+  text-align:center; padding:4px 0; font-size:11px; color:#999; position:relative;
+}
+.layer-arrow::before {
+  content:''; display:block;
+  width:0; height:0; margin:0 auto 3px auto;
+  border-left:10px solid transparent; border-right:10px solid transparent;
+  border-top:12px solid #ccc;
+}
+.layer-arrow::after {
+  content:''; display:block;
+  width:0; height:0; margin:3px auto 0 auto;
+  border-left:10px solid transparent; border-right:10px solid transparent;
+  border-bottom:12px solid #ccc;
+}
+.arrow-note { color:#aaa; font-size:10.5px; margin-top:2px; letter-spacing:0.5px; }
+
+/* 各层颜色 */
+.lFront   .layer-label, .lFront   .layer-body { background:#e8f5e9; } /* 绿 */
+.lAPI     .layer-label, .lAPI     .layer-body { background:#fff3e0; } /* 橙 */
+.lBiz     .layer-label, .lBiz     .layer-body { background:#e3f2fd; } /* 蓝 */
+.lData    .layer-label, .lData    .layer-body { background:#f3e5f5; } /* 紫 */
+.lStore   .layer-label, .lStore   .layer-body { background:#eceff1; } /* 灰 */
+.lExt     .layer-label, .lExt     .layer-body { background:#ffebee; } /* 红 */
+
+/* 子行分隔 */
+.sub-row { width:100%; border-top:1px dashed rgba(255,255,255,.5); padding-top:8px; margin-top:4px; }
+.sub-row:first-child { border:none; padding-top:0; margin-top:0; }
+
+/* 图二~六也用类似表格风格 */
+.section-box {
+  border-radius:10px; overflow:hidden; margin-bottom:14px;
+}
+.section-head {
+  padding:10px 16px; color:#fff; font-weight:bold;
+  font-size:13px; letter-spacing:1px; display:flex; align-items:center; gap:8px;
+}
+.section-body {
+  padding:14px 18px; background:rgba(255,255,255,.85);
+  display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+  min-height:44px;
+}
+
+.flow-section {
+  display:flex; flex-direction:column; gap:0; margin-bottom:12px;
+}
+.flow-arrow-down {
+  text-align:center; font-size:10px; color:#bbb;
+  padding:3px 0;
+}
+.flow-arrow-right {
+  display:inline-flex; align-items:center; min-width:36px; justify-content:center;
+  font-size:10px; color:#999;
+}
+.flow-arrow-right::after {
+  content:'▸'; font-size:16px; margin-left:2px; color:#bbb;
+}
+
+/* 菱形判断 */
+.diamond-card {
+  width:120px; height:120px; transform:rotate(45deg);
+  border-radius:14px; display:flex; align-items:center; justify-content:center;
+  color:#fff; font-weight:bold; font-size:11.5px; text-align:center;
+  line-height:1.35; box-shadow:0 2px 10px rgba(0,0,0,.12); margin:8px auto;
+}
+.diamond-card span { transform:rotate(-45deg); }
+
+/* 双列 */
+.dual-col { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+
+@media(max-width:800px){
+  .dual-col{grid-template-columns:1fr;}
+  .card{font-size:11.5px;padding:7px 10px;}
+  .layer-label{width:52px;font-size:11px;}
+  .layer-body{padding:8px 12px;}
+}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <a href="#fig1" class="active">图一·系统整体架构</a>
+  <a href="#fig2">图二·RAG问答流程</a>
+  <a href="#fig3">图三·文档入库索引</a>
+  <a href="#fig4">图四·双路召回RRF</a>
+  <a href="#fig5">图五·爬虫模块流程</a>
+  <a href="#fig6">图六·项目文件结构</a>
+</div>
+
+<!-- ================================================== -->
+<!-- 图一 · 系统整体架构 -->
+<!-- ================================================== -->
+<div class="figure" id="fig1">
+  <div class="fig-title">图一 · 系统整体架构</div>
+  <div class="fig-content">
+
+    <!-- L1 前端展示层 -->
+    <table class="arch-table"><tr class="arch-row lFront">
+      <td class="layer-label">前端展示层</td>
+      <td class="layer-body">
+        <div class="card"><span class="card-title">HTML/CSS 结构</span><span class="card-sub">页面骨架</span></div>
+        <div class="card"><span class="card-title">Vue.js 3</span><span class="card-sub">组件化渲染</span></div>
+        <div class="card"><span class="card-title">Fetch / Axios</span><span class="card-sub">HTTP 请求</span></div>
+        <div class="card"><span class="card-title">Markdown 渲染</span><span class="card-sub">答案展示</span></div>
+      </td>
+    </tr></table>
+    <div class="layer-arrow"><span class="arrow-note">HTTP Request / JSON 传输</span></div>
+
+    <!-- L2 接口交互层 -->
+    <table class="arch-table"><tr class="arch-row lAPI">
+      <td class="layer-label">接口交互层</td>
+      <td class="layer-body">
+        <div class="card"><span class="card-title">RESTful API</span><span class="card-sub">统一规范</span></div>
+        <div class="card"><span class="card-title">统一接口 api</span><span class="card-sub">路由前缀</span></div>
+        <div class="card"><span class="card-title">POST / GET / DELETE</span><span class="card-sub">请求方式</span></div>
+        <div class="card"><span class="card-title">JSON 数据格式</span><span class="card-sub">响应结构</span></div>
+      </td>
+    </tr></table>
+    <div class="layer-arrow"><span class="arrow-note">Spring IoC 注入</span></div>
+
+    <!-- L3 业务逻辑层 -->
+    <table class="arch-table"><tr class="arch-row lBiz">
+      <td class="layer-label">业务逻辑层<br/>Spring Boot</td>
+      <td class="layer-body" style="flex-direction:column;align-items:stretch;">
+        <div class="sub-row">
+          <span style="color:#1565c0;font-size:12px;font-weight:bold;margin-bottom:4px;">Controller —— 接收请求与参数校验</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <div class="card"><span class="card-title">RagController</span><span class="card-sub">问答控制器</span></div>
+            <div class="card"><span class="card-title">SearchController</span><span class="card-sub">搜索控制器</span></div>
+            <div class="card"><span class="card-title">IndexController</span><span class="card-sub">索引控制器</span></div>
+            <div class="card"><span class="card-title">DatasetController</span><span class="card-sub">数据集管理</span></div>
+            <div class="card"><span class="card-title">CrawlerController</span><span class="card-sub">爬虫控制器</span></div>
+          </div>
+        </div>
+        <div class="sub-row">
+          <span style="color:#1565c0;font-size:12px;font-weight:bold;margin-bottom:4px;">Service —— 核心业务逻辑实现</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <div class="card"><span class="card-title">RagService</span><span class="card-sub">RAG 主流程编排</span></div>
+            <div class="card"><span class="card-title">LuceneService</span><span class="card-sub">BM25 全文检索</span></div>
+            <div class="card"><span class="card-title">EmbeddingService</span><span class="card-sub">向量化调用</span></div>
+            <div class="card"><span class="card-title">ChunkService</span><span class="card-sub">文档分块处理</span></div>
+            <div class="card"><span class="card-title">CrawlerService</span><span class="card-sub">学习强国爬取</span></div>
+            <div class="card"><span class="card-title">LlmExtractService</span><span class="card-sub">LLM 内容提取</span></div>
+            <div class="card"><span class="card-title">WordExportService</span><span class="card-sub">Word 导出服务</span></div>
+          </div>
+        </div>
+      </td>
+    </tr></table>
+    <div class="layer-arrow"><span class="arrow-note">调用数据引擎</span></div>
+
+    <!-- L4 数据处理层 -->
+    <table class="arch-table"><tr class="arch-row lData">
+      <td class="layer-label">数据处理层</td>
+      <td class="layer-body">
+        <div class="card"><span class="card-title">SmartChineseAnalyzer</span><span class="card-sub">中文分词器</span></div>
+        <div class="card"><span class="card-title">MultiFieldQueryParser</span><span class="card-sub">多字段查询解析</span></div>
+        <div class="card"><span class="card-title">BM25 评分算法</span><span class="card-sub">相关性打分</span></div>
+        <div class="card"><span class="card-title">Highlighter</span><span class="card-sub">高亮片段提取</span></div>
+        <div class="card"><span class="card-title">text-embedding-v3</span><span class="card-sub">1024维向量化</span></div>
+        <div class="card"><span class="card-title">余弦相似度</span><span class="card-sub">HashMap 遍历计算</span></div>
+        <div class="card"><span class="card-title">RRF 融合排序</span><span class="card-sub">k = 60 平滑参数</span></div>
+        <div class="card"><span class="card-title">滑动窗口分块</span><span class="card-sub">512字 / 50字重叠</span></div>
+      </td>
+    </tr></table>
+    <div class="layer-arrow"><span class="arrow-note">读写持久化存储</span></div>
+
+    <!-- L5 存储层 -->
+    <table class="arch-table"><tr class="arch-row lStore">
+      <td class="layer-label">数据存储层</td>
+      <td class="layer-body">
+        <div class="card" style="min-width:200px;"><span class="card-title">MySQL 8.0</span><span class="card-sub">regulation_document / regulation_chunk / qa_history / system_config 四张核心表</span></div>
+        <div class="card"><span class="card-title">Lucene 索引引擎</span><span class="card-sub">data/lucene/ BM25倒排索引</span></div>
+        <div class="card"><span class="card-title">向量映射文件</span><span class="card-sub">data/faiss/*.json HashMap持久化</span></div>
+      </td>
+    </tr></table>
+    <div class="layer-arrow"><span class="arrow-note">HTTPS / 外部API 调用</span></div>
+
+    <!-- L6 外部服务层 -->
+    <table class="arch-table"><tr class="arch-row lExt">
+      <td class="layer-label">外部服务层</td>
+      <td class="layer-body">
+        <div class="card"><span class="card-title">阿里云百炼 API</span><span class="card-sub">qwen-plus + text-embedding-v3 OpenAI 兼容接口</span></div>
+        <div class="card"><span class="card-title">学习强国平台</span><span class="card-sub">boot-source.xuexi.cn OkHttp 抓取</span></div>
+        <div class="card"><span class="card-title">本地文件系统</span><span class="card-sub">POI/Apache Word/TXT 文件读取</span></div>
+      </td>
+    </tr></table>
+
+  </div>
+</div>
+
+
+<!-- ================================================== -->
+<!-- 图二 · RAG 问答完整流程 -->
+<!-- ================================================== -->
+<div class="figure" id="fig2">
+  <div class="fig-title">图二 · RAG 问答完整流程</div>
+  <div class="fig-content">
+    <table class="arch-table"><tr class="arch-row lFront">
+      <td class="layer-label" style="width:80px;">用户提问</td>
+      <td class="layer-body">
+        <div class="card"><span class="card-title">👤 用户输入问题</span><span class="card-sub">如："党员领导干部能否经商？"</span></div>
+        <div class="card"><span class="card-title">🖥️ Vue.js 前端</span><span class="card-sub">发送 POST 请求到 /api/rag/chat</span></div>
+      </td>
+    </tr></table>
+    <div class="layer-arrow"><span class="arrow-note">HTTP POST / JSON Body</span></div>
+
+    <table class="arch-table"><tr class="arch-row lAPI">
+      <td class="layer-label" style="width:80px;">接口接收</td>
+      <td class="layer-body">
+        <div class="card"><span class="card-title">RagController.chat()</span><span class="card-sub">接收 { question, topK, sessionId }</span></div>
+        <div class="card"><span class="card-title">参数校验</span><span class="card-sub">@Validated + 非空检查</span></div>
+      </td>
+    </tr></table>
+    <div class="layer-arrow"><span class="arrow-note">Spring Bean 调用 Service</span></div>
+
+    <table class="arch-table"><tr class="arch-row lBiz">
+      <td class="layer-label" style="width:80px;">业务处理</td>
+      <td class="layer-body" style="flex-direction:column;align-items:stretch;">
+        <div class="sub-row">
+          <span style="color:#1565c0;font-size:12px;font-weight:bold;margin-bottom:4px;">① 向量化查询</span>
+          <div class="card"><span class="card-title">EmbeddingService.getEmbedding()</span><span class="card-sub">调用阿里云百炼 text-embedding-v3 → 返回 1024 维向量</span></div>
+        </div>
+        <div class="sub-row">
+          <span style="color:#1565c0;font-size:12px;font-weight:bold;margin-bottom:4px;">② 并行双路召回（同时执行）</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <div class="card" style="border-color:#e65100;border-left:3px solid #e65100;">
+              <span class="card-title">🔍 路1：BM25 全文检索</span>
+              <span class="card-sub">SmartChineseAnalyzer → MultiFieldQueryParser → IndexSearcher.search() → Top-K 结果集 A</span>
+            </div>
+            <div class="card" style="border-color:#00695c;border-left:3px solid #00695c;">
+              <span class="card-title">📐 路2：向量语义检索</span>
+              <span class="card-sub">遍历 HashMap 计算余弦相似度 cosθ = (a·b)/(|a||b|) → Top-K 结果集 B</span>
+            </div>
+          </div>
+        </div>
+        <div class="sub-row">
+          <span style="color:#1565c0;font-size:12px;font-weight:bold;margin-bottom:4px;">③ RRF 融合排序</span>
+          <div class="card"><span class="card-title">score = Σ 1/(k + rankᵢ)</span><span class="card-sub">k=60，对两路结果去重合并后按分数降序排列，取最终 Top-K chunks</span></div>
+        </div>
+        <div class="sub-row">
+          <span style="color:#1565c0;font-size:12px;font-weight:bold;margin-bottom:4px;">④ LLM 生成回答</span>
+          <div class="card"><span class="card-title">拼接 Prompt</span><span class="card-sub">【系统角色】+【检索上下文】+【用户问题】→ 调用 qwen-plus → 生成带引用的回答</span></div>
+        </div>
+      </td>
+    </tr></table>
+    <div class="layer-arrow"><span class="arrow-note">返回 JSON 响应 + 异步保存历史</span></div>
+
+    <table class="arch-table"><tr class="arch-row lStore">
+      <td class="layer-label" style="width:80px;">结果输出</td>
+      <td class="layer-body">
+        <div class="card"><span class="card-title">📤 返回给前端</span><span class="card-sub">{ answer, sources[], usedChunks[] }</span></div>
+        <div class="card"><span class="card-title">💾 写入 qa_history 表</span><span class="card-sub">异步保存本次问答记录供后续查询</span></div>
+      </td>
+    </tr></table>
+  </div>
+</div>
+
+
+<!-- ================================================== -->
+<!-- 图三 · 文档入库与索引构建 -->
+<!-- ================================================== -->
+<div class="figure" id="fig3">
+  <div class="fig-title">图三 · 文档入库与索引构建流程</div>
+  <div class="fig-content">
+
+    <table class="arch-table"><tr class="arch-row lFront">
+      <td class="layer-label" style="width:70px;">文档入口</td>
+      <td class="layer-body">
+        <div class="card"><span class="card-title">🕷️ 学习强国爬虫</span><span class="card-sub">解析文章 ID 或 URL 格式</span></div>
+        <div class="card"><span class="card-title">✍️ 手动录入表单</span><span class="card-sub">填写 title / category / org</span></div>
+        <div class="card"><span class="card-title">📁 本地文件上传</span><span class="card-sub">Word / TXT / PDF 提取文本</span></div>
+      </td>
+    </tr></table>
+    <div class="layer-arrow"><span class="arrow-note">规范化处理后写入数据库</span></div>
+
+    <table class="arch-table"><tr class="arch-row lAPI">
+      <td class="layer-label" style="width:70px;">入库存储</td>
+      <td class="layer-body">
+        <div class="card"><span class="card-title">RegulationDocument 实体</span><span class="card-sub">title / category / org / publishDate / status / filePath / content / htmlContent</span></div>
+        <div class="card"><span class="card-title">MyBatis-Plus insert</span><span class="card-sub">自动填充 createTime/updateTime</span></div>
+      </td>
+    </tr></table>
+    <div class="layer-arrow"><span class="arrow-note">触发文档分块流程</span></div>
+
+    <table class="arch-table"><tr class="arch-row lBiz">
+      <td class="layer-label" style="width:70px;">分块处理</td>
+      <td class="layer-body" style="flex-direction:column;align-items:stretch;">
+        <div class="sub-row">
+          <span style="color:#1565c0;font-size:12px;font-weight:bold;margin-bottom:4px;">ChunkService 执行文档分块</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <div class="card"><span class="card-title">策略一：按段落分割</span><span class="card-sub">以连续空行为界，保留段落完整性</span></div>
+            <div class="card"><span class="card-title">策略二：固定窗口</span><span class="card-sub">512 字/块，50 字重叠防止语义截断</span></div>
+          </div>
+        </div>
+        <div class="sub-row">
+          <span style="color:#1565c0;font-size:12px;font-weight:bold;margin-bottom:4px;">RegulationChunk 分块入库</span>
+          <div class="card"><span class="card-title">字段</span><span class="card-sub">docId / chunkIndex / content / vectorId / tokenCount</span></div>
+        </div>
+      </td>
+    </tr></table>
+    <div class="layer-arrow"><span class="arrow-note">并行构建双路索引</span></div>
+
+    <table class="arch-table"><tr class="arch-row lData">
+      <td class="layer-label" style="width:70px;">索引构建</td>
+      <td class="layer-body" style="flex-direction:column;align-items:stretch;">
+        <div class="sub-row">
+          <span style="color:#7b1fa2;font-size:12px;font-weight:bold;margin-bottom:4px;">🔍 Lucene 全文索引通道</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <div class="card" style="border-color:#e65100;border-left:3px solid #e65100;"><span class="card-title">SmartChineseAnalyzer</span><span class="card-sub">中文智能分词</span></div>
+            <div class="card" style="border-color:#e65100;border-left:3px solid #e65100;"><span class="card-title">Document 构建</span><span class="card-sub">TextField(title) + TextField(content)</span></div>
+            <div class="card" style="border-color:#e65100;border-left:3px solid #e65100;"><span class="card-title">IndexWriter.addDocument</span><span class="card-sub">写入 data/lucene/ 目录</span></div>
+          </div>
+        </div>
+        <div class="sub-row">
+          <span style="color:#00796b;font-size:12px;font-weight:bold;margin-bottom:4px;">📐 向量嵌入通道</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <div class="card" style="border-color:#00695c;border-left:3px solid #00695c;"><span class="card-title">text-embedding-v3</span><span class="card-sub">逐 chunk 调用 API</span></div>
+            <div class="card" style="border-color:#00695c;border-left:3px solid #00695c;"><span class="card-title">1024 维 float[]</span><span class="card-sub">内存 HashMap 存储</span></div>
+            <div class="card" style="border-color:#00695c;border-left:3px solid #00695c;"><span class="card-title">JSON 序列化</span><span class="card-sub">持久化到 data/faiss/{docId}.json</span></div>
+          </div>
+        </div>
+      </td>
+    </tr></table>
+
+  </div>
+</div>
+
+
+<!-- ================================================== -->
+<!-- 图四 · 双路召回 + RRF 融合排序 -->
+<!-- ================================================== -->
+<div class="figure" id="fig4">
+  <div class="fig-title">图四 · 双路召回 + RRF 融合排序</div>
+  <div class="fig-content">
+
+    <table class="arch-table"><tr class="arch-row lFront">
+      <td class="layer-label" style="width:64px;">查询输入</td>
+      <td class="layer-body">
+        <div class="card"><span class="card-title">❓ 用户原始问题字符串</span><span class="card-sub">如："党员领导干部能否经商办企业？"</span></div>
+      </td>
+    </tr></table>
+    <div class="layer-arrow"><span class="arrow-note">EmbeddingService 向量化</span></div>
+
+    <!-- 双列并行 -->
+    <table class="arch-table"><tr class="arch-row lData">
+      <td colspan="2" class="layer-body" style="padding:0;display:block;">
+        <div class="dual-col">
+          <!-- 左：BM25路 -->
+          <div>
+            <div class="section-box">
+              <div class="section-head" style="background:linear-gradient(135deg,#e65100,#ff9800);">
+                🔍 BM25 全文检索通道
+              </div>
+              <div class="section-body" style="background:#fff8f0;flex-direction:column;align-items:stretch;gap:6px;">
+                <div class="card" style="justify-content:flex-start;width:auto;"><span class="card-title">① SmartChineseAnalyzer</span><span class="card-sub">对查询词进行中文分词</span></div>
+                <div class="card" style="justify-content:flex-start;width:auto;"><span class="card-title">② MultiFieldQueryParser</span><span class="card-sub">同时在 title 和 content 两个字段上构造布尔查询</span></div>
+                <div class="card" style="justify-content:flex-start;width:auto;"><span class="card-title">③ IndexSearcher.search(query, topK)</span><span class="card-sub">执行 Lucene 检索获取 Top-K 文档</span></div>
+                <div class="card" style="justify-content:flex-start;width:auto;background:#fff3e0;border-color:#e65100;"><span class="card-title">📊 输出结果集 A</span><span class="card-sub">[(docId₁, bm25Score), (docId₃, bm25Score), ...]</span></div>
+              </div>
+            </div>
+          </div>
+          <!-- 右：向量路 -->
+          <div>
+            <div class="section-box">
+              <div class="section-head" style="background:linear-gradient(135deg,#00695c,#26a69a);">
+                📐 向量语义检索通道
+              </div>
+              <div class="section-body" style="background:#e0f2f1;flex-direction:column;align-items:stretch;gap:6px;">
+                <div class="card" style="justify-content:flex-start;width:auto;"><span class="card-title">① 加载全部文档向量</span><span class="card-sub">从内存 HashMap&lt;id, float[1024]&gt; 取出所有向量</span></div>
+                <div class="card" style="justify-content:flex-start;width:auto;"><span class="card-title">② 遍历计算余弦相似度</span><span class="card-sub">cosθ = (a·b) / (|a| × |b|)，O(n) 时间复杂度</span></div>
+                <div class="card" style="justify-content:flex-start;width:auto;"><span class="card-title">③ PriorityQueue 取 Top-K</span><span class="card-sub">按相似度降序排列</span></div>
+                <div class="card" style="justify-content:flex-start;width:auto;background:#e0f2f1;border-color:#00695c;"><span class="card-title">📊 输出结果集 B</span><span class="card-sub">[(docId₂, vecScore), (docId₅, vecScore), ...]</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr></table>
+    <div class="layer-arrow"><span class="arrow-note">两路结果汇入 RRF 排序器</span></div>
+
+    <table class="arch-table"><tr class="arch-row lBiz">
+      <td class="layer-label" style="width:64px;">RRF 融合</td>
+      <td class="layer-body" style="flex-direction:column;align-items:stretch;">
+        <div class="sub-row">
+          <div class="card" style="min-width:500px;"><span class="card-title">🔀 Reciprocal Rank Fusion 公式</span><span class="card-sub">RRF(doc) = Σ 1/(k + rank_i(doc)) ，其中 k=60（平滑参数），i ∈ {BM25路, 向量路}</span></div>
+        </div>
+        <div class="sub-row">
+          <span style="color:#1565c0;font-size:12px;font-weight:bold;margin-bottom:4px;">融合步骤</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <div class="card"><span class="card-title">Step 1</span><span class="card-sub">两路结果按 docId 合并，同一文档保留两条排名</span></div>
+            <div class="card"><span class="card-title">Step 2</span><span class="card-sub">对每个文档代入 RRF 公式求和得分</span></div>
+            <div class="card"><span class="card-title">Step 3</span><span class="card-sub">按 RRF Score 降序排序，取最终 Top-K</span></div>
+          </div>
+        </div>
+        <div class="sub-row">
+          <div class="card" style="border-color:#7b1fa2;background:#faf5ff;"><span class="card-title">🎯 最终输出</span><span class="card-sub">Top-K chunks 列表（含 content + sourceDocTitle + score）→ 送入 Prompt 拼接</span></div>
+        </div>
+      </td>
+    </tr></table>
+
+  </div>
+</div>
+
+
+<!-- ================================================== -->
+<!-- 图五 · 爬虫模块流程 -->
+<!-- ================================================== -->
+<div class="figure" id="fig5">
+  <div class="fig-title">图五 · 爬虫模块流程</div>
+  <div class="fig-content">
+
+    <table class="arch-table"><tr class="arch-row lFront">
+      <td class="layer-label" style="width:68px;">输入解析</td>
+      <td class="layer-body">
+        <div class="card"><span class="card-title">🕷️ 用户输入文章链接</span><span class="card-sub">支持 lgpage/detail/index.html?id=xxx 或 /hash.html 两种格式</span></div>
+      </td>
+    </tr></table>
+    <div class="layer-arrow"><span class="arrow-note">CrawlerService 解析 URL 格式并提取文章ID</span></div>
+
+    <table class="arch-table"><tr class="arch-row lAPI">
+      <td class="layer-label" style="width:68px;">API 请求</td>
+      <td class="layer-body" style="flex-direction:column;align-items:stretch;">
+        <div class="sub-row">
+          <div class="card"><span class="card-title">构造请求地址</span><span class="card-sub">boot-source.xuexi.cn/data/app/{id}.js</span></div>
+        </div>
+        <div class="sub-row">
+          <div class="card"><span class="card-title">OkHttp GET 请求</span><span class="card-sub">设置 User-Agent / Timeout / 连接池</span></div>
+        </div>
+        <div class="sub-row">
+          <span style="color:#e65100;font-size:12px;font-weight:bold;margin-bottom:4px;">响应状态判断</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <div class="card" style="border-color:#ad1457;"><span class="card-title">❌ 失败</span><span class="card-sub">返回错误信息：URL无效或网络异常</span></div>
+            <div class="card" style="border-color:#2e7d32;"><span class="card-title">✅ 成功</span><span class="card-sub">进入下一步内容解析</span></div>
+          </div>
+        </div>
+      </td>
+    </tr></table>
+    <div class="layer-arrow"><span class="arrow-note">JSONP 回调解析 + Jsoup HTML 净化</span></div>
+
+    <table class="arch-table"><tr class="arch-row lBiz">
+      <td class="layer-label" style="width:68px;">操作分支</td>
+      <td class="layer-body" style="flex-direction:column;align-items:stretch;">
+        <div class="sub-row">
+          <div class="card"><span class="card-title">解析 JSONP 回调</span><span class="card-sub">提取 title / content / publishDate 等字段</span></div>
+        </div>
+        <div class="sub-row">
+          <div class="card"><span class="card-title">Jsoup HTML 净化</span><span class="card-sub">去除 script/style 标签，保留正文纯文本</span></div>
+        </div>
+        <div class="sub-row">
+          <span style="color:#1565c0;font-size:12px;font-weight:bold;margin-bottom:6px;">用户选择操作类型（5种）</span>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;">
+            <div class="card" style="border-color:#1976d2;border-top:3px solid #1976d2;">
+              <span class="card-title">👁️ 预览</span><span class="card-sub">返回标题+正文摘要预览<br/>不写入数据库</span>
+            </div>
+            <div class="card" style="border-color:#388e3c;border-top:3px solid #388e3c;">
+              <span class="card-title">📥 单篇入库</span><span class="card-sub">存入 regulation_document<br/>状态设为"待索引"</span>
+            </div>
+            <div class="card" style="border-color:#f57c00;border-top:3px solid #f57c00;">
+              <span class="card-title">📦 批量入库</span><span class="card-sub">并发爬取多篇文章<br/>批量插入返回统计</span>
+            </div>
+            <div class="card" style="border-color:#7b1fa2;border-top:3px solid #7b1fa2;">
+              <span class="card-title">🤖 AI 分析</span><span class="card-sub">LlmExtractService 调用 qwen-plus<br/>输出摘要/关键词/知识点</span>
+            </div>
+            <div class="card" style="border-color:#c2185b;border-top:3px solid #c2185b;">
+              <span class="card-title">💬 生成问答对</span><span class="card-sub">LlmExtractService 生成 3~5 组 Q&A<br/>可用于微调训练数据</span>
+            </div>
+          </div>
+        </div>
+        <div class="sub-row">
+          <div class="card" style="background:#f0f4ff;"><span class="card-title">📄 可选：Word 导出</span><span class="card-sub">WordExportService 将原文+AI分析结果导出为格式化 .docx 文件</span></div>
+        </div>
+      </td>
+    </tr></table>
+
+  </div>
+</div>
+
+
+<!-- ================================================== -->
+<!-- 图六 · 项目文件结构 -->
+<!-- ================================================== -->
+<div class="figure" id="fig6">
+  <div class="fig-title">图六 · 项目文件结构</div>
+  <div class="fig-content">
+
+    <!-- 根目录 -->
+    <table class="arch-table"><tr class="arch-row lFront">
+      <td class="layer-label" style="width:60px;">项目根目录</td>
+      <td class="layer-body">
+        <div class="card" style="min-width:240px;"><span class="card-title">📁 d:/bishe/</span><span class="card-sub">党内法规智能问答系统 · Spring Boot + Vue.js</span></div>
+        <div class="card"><span class="card-title">📄 index.html</span><span class="card-sub">前端单页应用入口</span></div>
+        <div class="card"><span class="card-title">📄 api-doc.js</span><span class="card-sub">接口文档 Word 生成脚本</span></div>
+        <div class="card"><span class="card-title">📁 generated-images/</span><span class="card-sub">AI 生成的图片资源</span></div>
+      </td>
+    </tr></table>
+    <div class="layer-arrow"><span class="arrow-note">Maven 多模块项目结构</span></div>
+
+    <!-- backend -->
+    <table class="arch-table"><tr class="arch-row lAPI">
+      <td class="layer-label" style="width:60px;">backend/<br/>Java源码</td>
+      <td class="layer-body" style="flex-direction:column;align-items:stretch;">
+        <div class="sub-row">
+          <span style="color:#e65100;font-size:12px;font-weight:bold;margin-bottom:4px;">📁 src/main/java/com/rag/demo/</span>
+        </div>
+        <!-- 6个包 -->
+        <div class="sub-row" style="display:flex;flex-wrap:wrap;gap:6px;">
+          <div class="card" style="border-color:#1565c2;border-left:3px solid #1565c2;">
+            <span class="card-title">config/</span>
+            <span class="card-sub">CorsConfig · IndexProperties · LlmProperties · MyBatisMetaHandler</span>
+          </div>
+          <div class="card" style="border-color:#e65100;border-left:3px solid #e65100;">
+            <span class="card-title">controller/</span>
+            <span class="card-sub">RagController · SearchController · IndexController · DatasetController · CrawlerController</span>
+          </div>
+          <div class="card" style="border-color:#2e7d32;border-left:3px solid #2e7d32;">
+            <span class="card-title">service/</span>
+            <span class="card-sub">RagService · LuceneService · EmbeddingService · ChunkService · CrawlerService · LlmExtractService · WordExportService</span>
+          </div>
+          <div class="card" style="border-color:#7b1fa2;border-left:3px solid #7b1fa2;">
+            <span class="card-title">entity/</span>
+            <span class="card-sub">RegulationDocument · RegulationChunk · QaHistory · SystemConfig</span>
+          </div>
+          <div class="card" style="border-color:#c2185b;border-left:3px solid #c2185b;">
+            <span class="card-title">mapper/</span>
+            <span class="card-sub">RegulationDocumentMapper · RegulationChunkMapper · QaHistoryMapper · SystemConfigMapper</span>
+          </div>
+          <div class="card" style="border-color:#00695c;border-left:3px solid #00695c;">
+            <span class="card-title">util/</span>
+            <span class="card-sub">EmbeddingUtil · CosineUtil · HtmlUtil</span>
+          </div>
+        </div>
+        <div class="sub-row">
+          <span style="color:#e65100;font-size:12px;font-weight:bold;margin-bottom:4px;">📁 src/main/resources/</span>
+          <div class="card" style="margin-left:0;"><span class="card-title">application.yml</span><span class="card-sub">数据库连接 / 百炼API配置 / Lucene路径 / 端口8088</span></div>
+          <div class="card"><span class="card-title">mapper/*.xml</span><span class="card-sub">MyBatis XML 映射文件（4个Mapper对应）</span></div>
+        </div>
+        <div class="sub-row">
+          <div class="card"><span class="card-title">📄 pom.xml</span><span class="card-sub">mybatis-plus / lucene-core / okhttp / poi-ooxml 依赖声明</span></div>
+        </div>
+      </td>
+    </tr></table>
+
+    <div class="layer-arrow"><span class="arrow-note">数据目录</span></div>
+
+    <!-- 数据目录 -->
+    <table class="arch-table"><tr class="arch-row lStore">
+      <td class="layer-label" style="width:60px;">运行时数据</td>
+      <td class="layer-body">
+        <div class="card"><span class="card-title">data/lucene/</span><span class="card-sub">Lucene 索引文件目录（segments / _X.cfe / _X.cfs）</span></div>
+        <div class="card"><span class="card-title">data/faiss/</span><span class="card-sub">向量 JSON 文件目录（按 docId 命名）</span></div>
+        <div class="card"><span class="card-title">logs/</span><span class="card-sub">Spring Boot 运行日志文件</span></div>
+      </td>
+    </tr></table>
+
+  </div>
+</div>
+
+
+<script>
+document.querySelectorAll('.nav a').forEach(a=>{
+  a.addEventListener('click',function(){
+    document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

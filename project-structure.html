@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>项目工程结构图</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Microsoft YaHei", "SimSun", monospace;
+    background: #fff;
+    padding: 40px;
+    color: #222;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+  h1 {
+    text-align: center;
+    font-size: 20px;
+    margin-bottom: 30px;
+    color: #111;
+    font-weight: normal;
+  }
+
+  .tree {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    white-space: pre;
+    border: 1px solid #ccc;
+    padding: 24px 16px;
+    background: #fafafa;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>图 4-x 项目工程结构图</h1>
+  <div class="tree">party-regulation/
+├── backend/                                          ← Spring Boot 后端 · Maven
+│   ├── pom.xml
+│   └── src/main/
+│       ├── java/com/party/regulation/
+│       │   ├── RegulationQaApplication.java           启动类
+│       │   ├── config/                                4个配置类（跨域 / 索引路径 / 大模型 / MyBatis填充）
+│       │   │   ├── CorsConfig.java                    跨域配置
+│       │   │   ├── IndexProperties.java               索引路径配置
+│       │   │   ├── LlmProperties.java                 大模型配置
+│       │   │   └── MyBatisMetaHandler.java            自动填充处理器
+│       │   ├── controller/                            5个控制器（RAG / 搜索 / 索引 / 数据集 / 爬虫）
+│       │   │   ├── RagController.java                 RAG问答接口
+│       │   │   ├── SearchController.java              搜索检索接口
+│       │   │   ├── IndexController.java               索引管理接口
+│       │   │   ├── DatasetController.java             数据集管理接口
+│       │   │   └── CrawlerController.java             爬虫采集接口
+│       │   ├── entity/                                4个实体类
+│       │   │   ├── RegulationDocument.java            法规文档
+│       │   │   ├── RegulationChunk.java              文档分块
+│       │   │   ├── QaHistory.java                     问答历史
+│       │   │   └── SystemConfig.java                  系统配置
+│       │   ├── mapper/                                4个Mapper接口
+│       │   │   ├── RegulationDocumentMapper.java
+│       │   │   ├── RegulationChunkMapper.java
+│       │   │   ├── QaHistoryMapper.java
+│       │   │   └── SystemConfigMapper.java
+│       │   └── service/                               6个业务服务（RAG / Lucene / 向量 / 分块 / 爬虫 / 大模型提取）
+│       │       ├── RagService.java                    RAG核心服务
+│       │       ├── LuceneService.java                 全文索引服务
+│       │       ├── EmbeddingService.java              向量化服务
+│       │       ├── ChunkService.java                  文档分块服务
+│       │       ├── CrawlerService.java                爬虫采集服务
+│       │       └── LlmExtractService.java             大模型提取服务
+│       └── resources/
+│           ├── application.yml                        应用配置文件
+│           ├── import_regulations.sql                 初始数据脚本
+│           └── prompts/                               3个Prompt模板
+│               ├── system-prompt.txt                  系统角色提示词
+│               ├── analyze-article.txt                文章分析提示词
+│               └── generate-qa.txt                    问答对生成提示词
+│   └── data/                                           运行时数据（Lucene索引 + 向量JSON）
+└── index.html                                         前端单页应用 · CDN引入Vue.js</div>
+</div>
+</body>
+</html>

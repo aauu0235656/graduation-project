@@ -35,6 +35,12 @@
 /generated-images/
 /crawl_batch*.json
 
+# ===== 论文图表HTML（本地保留） =====
+/project-flow*.html
+/project-structure.html
+/retrieval-sequence.html
+/crawler-diagrams.html
+
 # ===== 系统文件 =====
 .DS_Store
 Thumbs.db
